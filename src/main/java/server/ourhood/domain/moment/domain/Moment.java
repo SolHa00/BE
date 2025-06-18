@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import server.ourhood.domain.comment.domain.Comment;
 import server.ourhood.domain.room.domain.Room;
-import server.ourhood.domain.user.domain.BaseTimeEntity;
+import server.ourhood.domain.common.BaseTimeEntity;
 
 import java.util.ArrayList;
 import java.util.List;

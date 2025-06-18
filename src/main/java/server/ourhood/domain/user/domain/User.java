@@ -5,7 +5,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import server.ourhood.domain.auth.domain.OAuthIdentifier;
 import server.ourhood.domain.room.domain.RoomMembers;
+import server.ourhood.domain.common.BaseTimeEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,21 +23,29 @@ public class User extends BaseTimeEntity {
     @Column(name = "user_id")
     private Long id;
 
+    @Embedded
+    private OAuthIdentifier oauthIdentifier;
+
+    @Column
+    private String name;
+
     @Column(unique = true)
     private String nickname;
 
     @Column(unique = true)
     private String email;
-    private String password;
+
+    @Column
     private String profileImageUrl;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<RoomMembers> rooms = new ArrayList<>();
 
     @Builder
-    public User(String nickname, String email, String password) {
+    public User(OAuthIdentifier oauthIdentifier, String name, String nickname, String email) {
+        this.oauthIdentifier = oauthIdentifier;
+        this.name = name;
         this.nickname = nickname;
         this.email = email;
-        this.password = password;
     }
 }

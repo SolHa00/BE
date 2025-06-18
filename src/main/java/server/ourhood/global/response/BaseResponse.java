@@ -1,9 +1,10 @@
-package server.ourhood.global.handler.response;
+package server.ourhood.global.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import server.ourhood.global.exception.BaseResponseStatus;
 
 @Getter
 @AllArgsConstructor
@@ -33,10 +34,6 @@ public class BaseResponse<T> {
 
     public static <T> BaseResponse<T> success(T result) {
         return new BaseResponse<>(BaseResponseStatus.SUCCESS, result);
-    }
-
-    public static <T> BaseResponse<T> success(BaseResponseStatus status, T result) {
-        return new BaseResponse<>(status, result);
     }
 
     public static <T> BaseResponse<T> fail(BaseResponseStatus status) {
