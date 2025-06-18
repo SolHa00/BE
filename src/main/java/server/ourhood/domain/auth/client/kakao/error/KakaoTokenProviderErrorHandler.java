@@ -1,26 +1,28 @@
 package server.ourhood.domain.auth.client.kakao.error;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.net.URI;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import lombok.extern.slf4j.Slf4j;
 import server.ourhood.domain.auth.client.kakao.dto.response.KakaoErrorResponse;
 import server.ourhood.global.exception.BaseException;
 import server.ourhood.global.exception.BaseResponseStatus;
-
-import java.io.IOException;
-import java.net.URI;
 
 @Component
 @Slf4j
 public class KakaoTokenProviderErrorHandler implements ResponseErrorHandler {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper()
-			.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 	private static final String ERROR_CODE_WHEN_INVALID_CODE = "KOE320";
 

@@ -2,6 +2,7 @@ package server.ourhood.domain.auth.client.kakao.dto.request;
 
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+
 import server.ourhood.domain.auth.config.properties.KakaoProperties;
 
 public record KakaoTokenRequest(

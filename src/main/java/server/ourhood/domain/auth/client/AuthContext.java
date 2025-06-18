@@ -5,9 +5,9 @@ import lombok.Getter;
 @Getter
 public class AuthContext {
 
-    private final String authCode;
+	private final String authCode;
 
-    public AuthContext(String authCode) {
-        this.authCode = authCode;
-    }
+	public AuthContext(String authCode) {
+		this.authCode = authCode;
+	}
 }

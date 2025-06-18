@@ -1,9 +1,9 @@
 package server.ourhood.domain.auth.domain;
 
 public enum OAuthType {
-    GOOGLE, KAKAO;
+	GOOGLE, KAKAO;
 
-    public static OAuthType fromName(String name) {
-        return OAuthType.valueOf(name.toUpperCase());
-    }
+	public static OAuthType fromName(String name) {
+		return OAuthType.valueOf(name.toUpperCase());
+	}
 }

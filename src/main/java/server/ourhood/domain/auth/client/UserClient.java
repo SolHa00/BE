@@ -5,7 +5,7 @@ import server.ourhood.domain.user.domain.User;
 
 public interface UserClient {
 
-    OAuthType supportType();
+	OAuthType supportType();
 
-    User fetch(AuthContext context);
+	User fetch(AuthContext context);
 }

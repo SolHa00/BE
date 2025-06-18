@@ -1,13 +1,14 @@
 package server.ourhood.global.auth.resolver;
 
-import jakarta.servlet.http.HttpServletRequest;
-import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.auth.controller.HeaderHandler;
 import server.ourhood.domain.auth.service.TokenProvider;
 import server.ourhood.domain.user.domain.User;

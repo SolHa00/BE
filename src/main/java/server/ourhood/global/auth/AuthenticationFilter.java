@@ -1,17 +1,23 @@
 package server.ourhood.global.auth;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.auth.controller.HeaderHandler;
 import server.ourhood.domain.auth.service.TokenProvider;
 import server.ourhood.global.auth.annotation.PublicApi;
@@ -20,17 +26,13 @@ import server.ourhood.global.exception.BaseException;
 import server.ourhood.global.exception.BaseResponseStatus;
 import server.ourhood.global.response.BaseResponse;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.List;
-
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private static final List<String> ALWAYS_EXCLUDE_PATHS = List.of(
-			"/api/health"
+		"/api/health"
 	);
 
 	static {
@@ -53,7 +55,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 			Object handler = requestMappingHandlerMapping.getHandler(request).getHandler();
 
 			if (handler instanceof HandlerMethod) {
-				HandlerMethod handlerMethod = (HandlerMethod) handler;
+				HandlerMethod handlerMethod = (HandlerMethod)handler;
 
 				if (handlerMethod.getMethod().isAnnotationPresent(SecuredApi.class)) {
 					return false;
@@ -76,9 +78,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
 	@Override
 	protected void doFilterInternal(
-			HttpServletRequest request,
-			HttpServletResponse response,
-			FilterChain filterChain) throws ServletException, IOException {
+		HttpServletRequest request,
+		HttpServletResponse response,
+		FilterChain filterChain) throws ServletException, IOException {
 
 		try {
 			if (!shouldSkipFilter(request)) {

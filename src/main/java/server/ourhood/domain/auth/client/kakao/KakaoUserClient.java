@@ -1,7 +1,8 @@
 package server.ourhood.domain.auth.client.kakao;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.auth.client.AuthContext;
 import server.ourhood.domain.auth.client.UserClient;
 import server.ourhood.domain.auth.client.kakao.dto.response.KakaoTokenResponse;
@@ -36,9 +37,9 @@ public class KakaoUserClient implements UserClient {
 			.build();
 
 		return User.builder()
-				.name(response.kakaoAccount().nickname())
-				.email(response.kakaoAccount().email())
-				.oauthIdentifier(oAuthIdentifier)
-				.build();
+			.name(response.kakaoAccount().nickname())
+			.email(response.kakaoAccount().email())
+			.oauthIdentifier(oAuthIdentifier)
+			.build();
 	}
 }

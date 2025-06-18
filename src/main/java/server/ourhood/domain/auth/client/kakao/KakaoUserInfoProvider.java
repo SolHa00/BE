@@ -1,14 +1,15 @@
 package server.ourhood.domain.auth.client.kakao;
 
+import java.nio.charset.StandardCharsets;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+
 import server.ourhood.domain.auth.client.kakao.dto.response.KakaoUserResponse;
 import server.ourhood.domain.auth.client.kakao.error.KakaoUserInfoProviderErrorHandler;
 import server.ourhood.domain.auth.config.properties.KakaoProperties;
-
-import java.nio.charset.StandardCharsets;
 
 @Component
 public class KakaoUserInfoProvider {
@@ -17,8 +18,8 @@ public class KakaoUserInfoProvider {
 	private final KakaoProperties kakaoProperties;
 
 	public KakaoUserInfoProvider(RestClient.Builder restClientBuilder,
-                                 KakaoUserInfoProviderErrorHandler errorHandler,
-                                 KakaoProperties kakaoProperties) {
+		KakaoUserInfoProviderErrorHandler errorHandler,
+		KakaoProperties kakaoProperties) {
 
 		this.restClient = restClientBuilder.clone()
 			.defaultStatusHandler(errorHandler)

@@ -14,16 +14,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class OAuthIdentifier {
 
-    @Column(name = "oauth_id")
-    private String oauthId;
+	@Column(name = "oauth_id")
+	private String oauthId;
 
-    @Column(name = "oauth_type")
-    @Enumerated(EnumType.STRING)
-    private OAuthType oauthType;
+	@Column(name = "oauth_type")
+	@Enumerated(EnumType.STRING)
+	private OAuthType oauthType;
 
-    @Builder
-    public OAuthIdentifier(String oauthId, OAuthType oauthType) {
-        this.oauthId = oauthId;
-        this.oauthType = oauthType;
-    }
+	@Builder
+	public OAuthIdentifier(String oauthId, OAuthType oauthType) {
+		this.oauthId = oauthId;
+		this.oauthType = oauthType;
+	}
 }

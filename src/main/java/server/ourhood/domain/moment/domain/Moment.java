@@ -1,43 +1,59 @@
 package server.ourhood.domain.moment.domain;
 
-import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import server.ourhood.domain.comment.domain.Comment;
-import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.common.BaseTimeEntity;
+import server.ourhood.domain.room.domain.Room;
+import server.ourhood.domain.user.domain.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Getter
+@Entity(name = "moment")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Entity
+@Getter
 public class Moment extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "moment_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "moment_id")
+	private Long id;
 
-    private Long userId;
-    private String imageUrl;
-    private String momentDescription;
+	@Column(name = "image_url", nullable = false)
+	private String imageUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "room_id")
-    private Room room;
+	@Column(name = "moment_description")
+	private String momentDescription;
 
-    @OneToMany(mappedBy = "moment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "room_id")
+	private Room room;
 
-    @Builder
-    public Moment(Long userId, String imageUrl, String momentDescription, Room room) {
-        this.userId = userId;
-        this.imageUrl = imageUrl;
-        this.momentDescription = momentDescription;
-        this.room = room;
-    }
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private User user;
+
+	@OneToMany(mappedBy = "moment", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Comment> comments = new ArrayList<>();
+
+	@Builder
+	public Moment(String imageUrl, String momentDescription, Room room, User user) {
+		this.imageUrl = imageUrl;
+		this.momentDescription = momentDescription;
+		this.room = room;
+		this.user = user;
+	}
 }
