@@ -1,16 +1,17 @@
 package server.ourhood.domain.auth.client.kakao.error;
 
-import lombok.extern.slf4j.Slf4j;
+import java.io.IOException;
+import java.net.URI;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResponseErrorHandler;
+
+import lombok.extern.slf4j.Slf4j;
 import server.ourhood.global.exception.BaseException;
 import server.ourhood.global.exception.BaseResponseStatus;
-
-import java.io.IOException;
-import java.net.URI;
 
 @Component
 @Slf4j

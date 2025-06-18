@@ -1,8 +1,9 @@
 package server.ourhood.domain.auth.client.kakao;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.auth.client.AuthCodeRequestUrlProvider;
 import server.ourhood.domain.auth.config.properties.KakaoProperties;
 import server.ourhood.domain.auth.domain.OAuthType;
