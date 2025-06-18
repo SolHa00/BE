@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import server.ourhood.domain.moment.domain.Moment;
-import server.ourhood.domain.user.domain.BaseTimeEntity;
+import server.ourhood.domain.common.BaseTimeEntity;
 import server.ourhood.domain.user.domain.User;
 
 import java.util.ArrayList;

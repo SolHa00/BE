@@ -1,4 +1,4 @@
-package server.ourhood.global.handler.response;
+package server.ourhood.global.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

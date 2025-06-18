@@ -1,4 +1,4 @@
-package server.ourhood.domain.user.domain;
+package server.ourhood.domain.common;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

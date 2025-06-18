@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import server.ourhood.domain.invitation.domain.Invitation;
 import server.ourhood.domain.join.domain.JoinRequest;
 import server.ourhood.domain.moment.domain.Moment;
-import server.ourhood.domain.user.domain.BaseTimeEntity;
+import server.ourhood.domain.common.BaseTimeEntity;
 
 import java.util.ArrayList;
 import java.util.List;
