@@ -27,6 +27,8 @@ public enum BaseResponseStatus {
 	JWT_UNAUTHORIZED(40101, HttpStatus.UNAUTHORIZED, "JWT를 찾을 수 없습니다."),
 	INVALID_ACCESS_TOKEN(40102, HttpStatus.UNAUTHORIZED, "access token이 유효하지 않습니다."),
 	EXPIRED_REFRESH_TOKEN(40103, HttpStatus.UNAUTHORIZED, "refresh token이 만료되었습니다."),
+	COOKIE_NOT_EXIST(40104, HttpStatus.UNAUTHORIZED, "쿠키가 존재하지 않습니다."),
+	INVALID_COOKIE(40105, HttpStatus.UNAUTHORIZED, "유효하지 않은 쿠키입니다."),
 
 	/**
 	 * 403 FORBIDDEN 권한없음

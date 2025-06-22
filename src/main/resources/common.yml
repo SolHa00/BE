@@ -18,5 +18,10 @@ oauth:
 
 auth:
   access-token-secret: ${JWT_ACCESS_TOKEN_SECRET}
-  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME:7200}
-  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME:604800000}
+  access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME}
+  refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
+
+cookie:
+  refresh-token:
+    expiry: ${COOKIE_REFRESH_TOKEN_EXPIRY}
+    name: "refresh_token"
