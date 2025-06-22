@@ -8,8 +8,7 @@ import server.ourhood.domain.auth.client.AuthCodeRequestUrlProviderComposite;
 import server.ourhood.domain.auth.client.UserClientComposite;
 import server.ourhood.domain.auth.domain.OAuthType;
 import server.ourhood.domain.auth.dto.TokenDto;
-import server.ourhood.domain.auth.dto.request.RefreshTokenRequest;
-import server.ourhood.domain.auth.dto.response.AuthResponse;
+import server.ourhood.domain.auth.dto.response.AuthServiceResponse;
 import server.ourhood.domain.auth.dto.response.OAuthUrlResponse;
 import server.ourhood.domain.auth.dto.response.TokenResponse;
 import server.ourhood.domain.user.domain.User;
@@ -30,10 +29,10 @@ public class AuthService {
 	}
 
 	@Transactional
-	public AuthResponse loginAndGenerateToken(OAuthType oauthType, String authCode) {
+	public AuthServiceResponse loginAndGenerateToken(OAuthType oauthType, String authCode) {
 		User savedUser = login(oauthType, authCode);
 		TokenDto tokens = tokenProvider.provideTokens(savedUser);
-		return new AuthResponse(tokens, savedUser);
+		return new AuthServiceResponse(tokens, savedUser);
 	}
 
 	private User login(OAuthType oauthType, String authCode) {
@@ -42,12 +41,13 @@ public class AuthService {
 			.orElseGet(() -> userRepository.save(user));
 	}
 
-	public TokenResponse refreshToken(RefreshTokenRequest request) {
-		String refreshToken = request.refreshToken();
+	@Transactional
+	public TokenResponse refresh(String refreshToken) {
 		String accessToken = tokenProvider.provideAccessTokenByRefreshToken(refreshToken);
-		return new TokenResponse(accessToken, refreshToken);
+		return new TokenResponse(accessToken);
 	}
 
+	@Transactional
 	public void logout(String refreshToken) {
 		tokenProvider.invalidateRefreshToken(refreshToken);
 	}
