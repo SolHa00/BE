@@ -5,10 +5,9 @@ import server.ourhood.domain.user.domain.User;
 
 public record AuthResponse(
 	TokenResponse token,
-	UserResponse user
-) {
+	UserResponse user) {
 	public AuthResponse(TokenDto tokens, User user) {
-		this(new TokenResponse(tokens.accessToken(), tokens.refreshToken()),
+		this(new TokenResponse(tokens.accessToken()),
 			new UserResponse(user));
 	}
 }
