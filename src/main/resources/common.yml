@@ -25,3 +25,15 @@ cookie:
   refresh-token:
     expiry: ${COOKIE_REFRESH_TOKEN_EXPIRY}
     name: "refresh_token"
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${ACCESS_KEY}
+      secret-key: ${SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ${S3_BUCKET}
+    stack:
+      auto: false
