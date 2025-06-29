@@ -24,13 +24,11 @@ public class S3Service {
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
-	public String upload(MultipartFile multipartFile, String dirName) {
-		String fileName = dirName + "/" + createFileName(multipartFile.getOriginalFilename());
-
+	public String upload(MultipartFile multipartFile) {
+		String fileName = createFileName(multipartFile.getOriginalFilename());
 		ObjectMetadata objectMetadata = new ObjectMetadata();
 		objectMetadata.setContentType(multipartFile.getContentType());
 		objectMetadata.setContentLength(multipartFile.getSize());
-
 		try (InputStream inputStream = multipartFile.getInputStream()) {
 			amazonS3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata));
 		} catch (IOException e) {
@@ -52,10 +50,6 @@ public class S3Service {
 	}
 
 	public void deleteFile(String fileName) {
-		try {
-			amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
-		} catch (Exception e) {
-			throw new RuntimeException("Failed to delete file from S3: " + e.getMessage(), e);
-		}
+		amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
 	}
 }
