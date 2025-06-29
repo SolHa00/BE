@@ -53,4 +53,18 @@ public class Room extends BaseTimeEntity {
 		this.thumbnailImageUrl = thumbnailImageUrl;
 		this.host = host;
 	}
+
+	public void addRoomMember(User user) {
+		RoomMembers roomMembers = RoomMembers.builder()
+			.user(user)
+			.room(this)
+			.build();
+		this.roomMembers.add(roomMembers);
+	}
+
+	public void update(String roomName, String roomDescription, String thumbnailImageUrl) {
+		this.roomName = roomName;
+		this.roomDescription = roomDescription;
+		this.thumbnailImageUrl = thumbnailImageUrl;
+	}
 }
