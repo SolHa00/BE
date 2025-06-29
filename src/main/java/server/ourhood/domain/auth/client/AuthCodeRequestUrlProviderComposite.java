@@ -24,7 +24,7 @@ public class AuthCodeRequestUrlProviderComposite {
 
 	public String provide(OAuthType oauthType) {
 		return Optional.ofNullable(mapping.get(oauthType))
-			.orElseThrow(() -> new BaseException(BaseResponseStatus.OAUTH_TYPE_NOT_FOUND))
+			.orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_AUTH_TYPE))
 			.provide();
 	}
 }
