@@ -25,7 +25,7 @@ public class UserClientComposite {
 
 	public User fetch(OAuthType oauthType, AuthContext context) {
 		return Optional.ofNullable(mapping.get(oauthType))
-			.orElseThrow(() -> new BaseException(BaseResponseStatus.OAUTH_TYPE_NOT_FOUND))
+			.orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_AUTH_TYPE))
 			.fetch(context);
 	}
 
