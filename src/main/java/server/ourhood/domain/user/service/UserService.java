@@ -27,7 +27,7 @@ public class UserService {
 	@Transactional
 	public void createProfileImage(Long userId, MultipartFile profileImage) {
 		User user = findUserById(userId);
-		String profileImageUrl = s3Service.upload(profileImage);
+		String profileImageUrl = uploadProfileImage(profileImage);
 		user.updateProfileImage(profileImageUrl);
 	}
 
@@ -37,7 +37,7 @@ public class UserService {
 		if (user.getProfileImageUrl() != null) {
 			deleteProfileImage(user.getProfileImageUrl());
 		}
-		String profileImageUrl = s3Service.upload(profileImage);
+		String profileImageUrl = uploadProfileImage(profileImage);
 		user.updateProfileImage(profileImageUrl);
 	}
 
@@ -48,6 +48,10 @@ public class UserService {
 			deleteProfileImage(user.getProfileImageUrl());
 			user.updateProfileImage(null);
 		}
+	}
+
+	private String uploadProfileImage(MultipartFile profileImage) {
+		return s3Service.upload(profileImage);
 	}
 
 	private void deleteProfileImage(String profileImageUrl) {
