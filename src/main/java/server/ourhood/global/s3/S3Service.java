@@ -49,7 +49,12 @@ public class S3Service {
 		}
 	}
 
-	public void deleteFile(String fileName) {
+	public void deleteFile(String imageUrl) {
+		String fileName = extractFileNameFromUrl(imageUrl);
 		amazonS3Client.deleteObject(new DeleteObjectRequest(bucket, fileName));
+	}
+
+	private String extractFileNameFromUrl(String url) {
+		return url.substring(url.lastIndexOf("/") + 1);
 	}
 }

@@ -34,8 +34,9 @@ public enum BaseResponseStatus {
 	 * 403 FORBIDDEN 권한없음
 	 */
 	FORBIDDEN(403, HttpStatus.FORBIDDEN, "접근 권한이 없음"),
-	HOST_CANNOT_LEAVE_ROOM(40301, HttpStatus.FORBIDDEN, "방장은 방을 나갈 수 없습니다"),
-	NOT_ROOM_HOST(40302, HttpStatus.FORBIDDEN, "방장만 이 작업을 수행할 수 있습니다"),
+	HOST_CANNOT_LEAVE_ROOM(40301, HttpStatus.FORBIDDEN, "방장은 방을 나갈 수 없습니다."),
+	NOT_ROOM_HOST(40302, HttpStatus.FORBIDDEN, "방장만 이 작업을 수행할 수 있습니다."),
+	NOT_MOMENT_OWNER(40303, HttpStatus.FORBIDDEN, "Moment 소유자만 해당 작업을 수행할 수 있습니다."),
 
 	/**
 	 * 404 NOT_FOUND 잘못된 리소스 접근
@@ -45,6 +46,7 @@ public enum BaseResponseStatus {
 	NOT_FOUND_USER(40402, HttpStatus.NOT_FOUND, "User를 찾을 수 없습니다."),
 	NOT_FOUND_ROOM(40403, HttpStatus.NOT_FOUND, "Room을 찾을 수 없습니다."),
 	USER_NOT_IN_ROOM(40404, HttpStatus.NOT_FOUND, "사용자가 방에 속해있지 않습니다"),
+	NOT_FOUND_MOMENT(40405, HttpStatus.NOT_FOUND, "존재하지 않는 모먼트입니다."),
 
 	/**
 	 * 409 CONFLICT 중복된 리소스

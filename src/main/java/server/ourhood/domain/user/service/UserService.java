@@ -27,7 +27,7 @@ public class UserService {
 	@Transactional
 	public void createProfileImage(Long userId, MultipartFile profileImage) {
 		User user = findUserById(userId);
-		String profileImageUrl = uploadProfileImage(profileImage);
+		String profileImageUrl = s3Service.upload(profileImage);
 		user.updateProfileImage(profileImageUrl);
 	}
 
@@ -35,31 +35,16 @@ public class UserService {
 	public void updateProfileImage(Long userId, MultipartFile profileImage) {
 		User user = findUserById(userId);
 		if (user.getProfileImageUrl() != null) {
-			deleteProfileImage(user.getProfileImageUrl());
+			s3Service.deleteFile(user.getProfileImageUrl());
 		}
-		String profileImageUrl = uploadProfileImage(profileImage);
+		String profileImageUrl = s3Service.upload(profileImage);
 		user.updateProfileImage(profileImageUrl);
 	}
 
 	@Transactional
 	public void deleteProfileImage(Long userId) {
 		User user = findUserById(userId);
-		if (user.getProfileImageUrl() != null) {
-			deleteProfileImage(user.getProfileImageUrl());
-			user.updateProfileImage(null);
-		}
-	}
-
-	private String uploadProfileImage(MultipartFile profileImage) {
-		return s3Service.upload(profileImage);
-	}
-
-	private void deleteProfileImage(String profileImageUrl) {
-		String fileName = extractFileNameFromUrl(profileImageUrl);
-		s3Service.deleteFile(fileName);
-	}
-
-	private String extractFileNameFromUrl(String url) {
-		return url.substring(url.lastIndexOf("/") + 1);
+		s3Service.deleteFile(user.getProfileImageUrl());
+		user.updateProfileImage(null);
 	}
 }

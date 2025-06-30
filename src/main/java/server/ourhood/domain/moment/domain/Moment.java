@@ -56,4 +56,8 @@ public class Moment extends BaseTimeEntity {
 		this.room = room;
 		this.user = user;
 	}
+
+	public void update(String momentDescription) {
+		this.momentDescription = momentDescription;
+	}
 }

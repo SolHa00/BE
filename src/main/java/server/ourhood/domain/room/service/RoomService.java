@@ -34,7 +34,7 @@ public class RoomService {
 	public RoomCreateResponse createRoom(User host, RoomCreateRequest request) {
 		String thumbnailImageUrl = null;
 		if (hasRoomThumbnail(request.thumbnail())) {
-			thumbnailImageUrl = uploadThumbnailImage(request.thumbnail());
+			thumbnailImageUrl = s3Service.upload(request.thumbnail());
 		}
 		Room room = RoomConverter.toRoom(request.roomName(), request.roomDescription(), thumbnailImageUrl, host);
 		room.addRoomMember(host);
@@ -51,9 +51,9 @@ public class RoomService {
 		String thumbnailImageUrl = room.getThumbnailImageUrl();
 		if (hasRoomThumbnail(request.thumbnail())) {
 			if (thumbnailImageUrl != null) {
-				deleteThumbnailImage(thumbnailImageUrl);
+				s3Service.deleteFile(thumbnailImageUrl);
 			}
-			thumbnailImageUrl = uploadThumbnailImage(request.thumbnail());
+			thumbnailImageUrl = s3Service.upload(request.thumbnail());
 		}
 		room.update(request.roomName(), request.roomDescription(), thumbnailImageUrl);
 	}
@@ -65,7 +65,7 @@ public class RoomService {
 			throw new BaseException(BaseResponseStatus.NOT_ROOM_HOST);
 		}
 		if (room.getThumbnailImageUrl() != null) {
-			deleteThumbnailImage(room.getThumbnailImageUrl());
+			s3Service.deleteFile(room.getThumbnailImageUrl());
 		}
 		roomRepository.delete(room);
 	}
@@ -89,18 +89,5 @@ public class RoomService {
 
 	private boolean isUserRoomHost(User user, Room room) {
 		return room.getHost().getId().equals(user.getId());
-	}
-
-	private String uploadThumbnailImage(MultipartFile thumbnailImage) {
-		return s3Service.upload(thumbnailImage);
-	}
-
-	private void deleteThumbnailImage(String thumbnailImageUrl) {
-		String fileName = extractFileNameFromUrl(thumbnailImageUrl);
-		s3Service.deleteFile(fileName);
-	}
-
-	private String extractFileNameFromUrl(String url) {
-		return url.substring(url.lastIndexOf("/") + 1);
 	}
 }
