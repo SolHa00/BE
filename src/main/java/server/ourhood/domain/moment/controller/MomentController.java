@@ -25,20 +25,20 @@ public class MomentController {
 	private final MomentService momentService;
 
 	@PostMapping
-	public BaseResponse<MomentCreateResponse> createMoment(@LoginUser User user, MomentCreateRequest request) {
+	public BaseResponse<MomentCreateResponse> addMoment(@LoginUser User user, MomentCreateRequest request) {
 		MomentCreateResponse response = momentService.createMoment(user, request);
 		return BaseResponse.success(response);
 	}
 
 	@PutMapping("/{momentId}")
-	public BaseResponse<Void> updateMoment(@LoginUser User user, @PathVariable Long momentId,
+	public BaseResponse<Void> fixMoment(@LoginUser User user, @PathVariable Long momentId,
 		@RequestBody MomentUpdateRequest request) {
 		momentService.updateMoment(user, momentId, request);
 		return BaseResponse.success();
 	}
 
 	@DeleteMapping("/{momentId}")
-	public BaseResponse<Void> deleteMoment(@LoginUser User user, @PathVariable Long momentId) {
+	public BaseResponse<Void> removeMoment(@LoginUser User user, @PathVariable Long momentId) {
 		momentService.deleteMoment(user, momentId);
 		return BaseResponse.success();
 	}
