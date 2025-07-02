@@ -56,4 +56,12 @@ public class Comment extends BaseTimeEntity {
 		this.moment = moment;
 		this.parent = parent;
 	}
+
+	public void updateContent(String content) {
+		this.content = content;
+	}
+
+	public boolean isReply() {
+		return this.parent != null;
+	}
 }
