@@ -38,6 +38,8 @@ public enum BaseResponseStatus {
 	NOT_ROOM_HOST(40302, HttpStatus.FORBIDDEN, "Room Host만 해당 작업을 수행할 수 있습니다."),
 	NOT_MOMENT_OWNER(40303, HttpStatus.FORBIDDEN, "Moment 소유자만 해당 작업을 수행할 수 있습니다."),
 	NOT_COMMENT_OWNER(40304, HttpStatus.FORBIDDEN, "Comment 소유자만 해당 작업을 수행할 수 있습니다."),
+	NOT_JOIN_REQUEST_OWNER(40305, HttpStatus.FORBIDDEN, "Join Request 소유자만 해당 작업을 수행할 수 있습니다."),
+	NOT_ROOM_MEMBER(40306, HttpStatus.FORBIDDEN, "Room 멤버만 해당 작업을 수행할 수 있습니다."),
 
 	/**
 	 * 404 NOT_FOUND 잘못된 리소스 접근
@@ -49,6 +51,7 @@ public enum BaseResponseStatus {
 	USER_NOT_IN_ROOM(40404, HttpStatus.NOT_FOUND, "사용자가 방에 속해있지 않습니다"),
 	NOT_FOUND_MOMENT(40405, HttpStatus.NOT_FOUND, "존재하지 않는 Moment입니다."),
 	NOT_FOUND_COMMENT(40406, HttpStatus.NOT_FOUND, "존재하지 않는 Comment입니다."),
+	NOT_FOUND_JOIN_REQUEST(40407, HttpStatus.NOT_FOUND, "존재하지 않는 Join Request입니다."),
 
 	/**
 	 * 422 UNPROCESSABLE_ENTITY
@@ -60,6 +63,7 @@ public enum BaseResponseStatus {
 	 * 409 CONFLICT 중복된 리소스
 	 */
 	CONFLICT(409, HttpStatus.CONFLICT, "중복된 리소스"),
+	CONFLICT_JOIN_REQUEST(40901, HttpStatus.CONFLICT, "이미 참여 요청을 보냈습니다."),
 
 	/**
 	 * 5XX Error
