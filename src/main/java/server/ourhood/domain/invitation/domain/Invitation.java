@@ -2,6 +2,8 @@ package server.ourhood.domain.invitation.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -34,9 +36,18 @@ public class Invitation extends BaseTimeEntity {
 	@JoinColumn(name = "room_id")
 	private Room room;
 
+	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
+	private InvitationStatus status;
+
 	@Builder
 	public Invitation(User user, Room room) {
 		this.user = user;
 		this.room = room;
+		this.status = InvitationStatus.PENDING;
+	}
+
+	public void changeStatus(InvitationStatus status) {
+		this.status = status;
 	}
 }

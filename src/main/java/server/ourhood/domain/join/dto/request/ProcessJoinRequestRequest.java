@@ -1,6 +1,6 @@
 package server.ourhood.domain.join.dto.request;
 
-public record JoinRequestUpdateRequest(
+public record ProcessJoinRequestRequest(
 	String status
 ) {
 }

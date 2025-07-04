@@ -24,6 +24,12 @@ public class UserService {
 			.orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
 	}
 
+	@Transactional(readOnly = true)
+	public User findUserByNickname(String nickname) {
+		return userRepository.findByNickname(nickname)
+			.orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_USER));
+	}
+
 	@Transactional
 	public void createProfileImage(Long userId, MultipartFile profileImage) {
 		User user = findUserById(userId);

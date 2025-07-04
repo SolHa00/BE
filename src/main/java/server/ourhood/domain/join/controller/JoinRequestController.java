@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
-import server.ourhood.domain.join.dto.request.JoinRequestUpdateRequest;
+import server.ourhood.domain.join.dto.request.ProcessJoinRequestRequest;
 import server.ourhood.domain.join.dto.response.JoinRequestCreateResponse;
 import server.ourhood.domain.join.service.JoinRequestService;
 import server.ourhood.domain.user.domain.User;
@@ -22,21 +22,21 @@ public class JoinRequestController {
 
 	private final JoinRequestService joinRequestService;
 
-	@PostMapping("/api/join-request")
+	@PostMapping("/api/join-requests")
 	public BaseResponse<JoinRequestCreateResponse> addJoinRequest(@LoginUser User user,
 		@RequestBody JoinRequestCreateRequest request) {
 		JoinRequestCreateResponse response = joinRequestService.createJoinRequest(user, request);
 		return BaseResponse.success(response);
 	}
 
-	@PatchMapping("/api/join-request/{joinRequestId}")
+	@PatchMapping("/api/join-requests/{joinRequestId}")
 	public BaseResponse<Void> processJoinRequest(@LoginUser User user, @PathVariable Long joinRequestId,
-		@RequestBody JoinRequestUpdateRequest request) {
+		@RequestBody ProcessJoinRequestRequest request) {
 		joinRequestService.processJoinRequest(user, joinRequestId, request);
 		return BaseResponse.success();
 	}
 
-	@DeleteMapping("/api/join-request/{joinRequestId}")
+	@DeleteMapping("/api/join-requests/{joinRequestId}")
 	public BaseResponse<Void> removeJoinRequest(@LoginUser User user, @PathVariable Long joinRequestId) {
 		joinRequestService.deleteJoinRequest(user, joinRequestId);
 		return BaseResponse.success();
