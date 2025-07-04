@@ -11,4 +11,6 @@ import server.ourhood.domain.user.domain.User;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByOauthIdentifier(OAuthIdentifier oauthIdentifier);
+
+	Optional<User> findByNickname(String nickname);
 }
