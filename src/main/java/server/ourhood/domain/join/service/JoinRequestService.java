@@ -8,7 +8,7 @@ import server.ourhood.domain.join.converter.JoinRequestConverter;
 import server.ourhood.domain.join.domain.JoinRequest;
 import server.ourhood.domain.join.domain.JoinRequestStatus;
 import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
-import server.ourhood.domain.join.dto.request.JoinRequestUpdateRequest;
+import server.ourhood.domain.join.dto.request.ProcessJoinRequestRequest;
 import server.ourhood.domain.join.dto.response.JoinRequestCreateResponse;
 import server.ourhood.domain.join.repository.JoinRequestRepository;
 import server.ourhood.domain.room.domain.Room;
@@ -40,7 +40,7 @@ public class JoinRequestService {
 	}
 
 	@Transactional
-	public void processJoinRequest(User user, Long joinRequestId, JoinRequestUpdateRequest request) {
+	public void processJoinRequest(User user, Long joinRequestId, ProcessJoinRequestRequest request) {
 		JoinRequest joinRequest = findJoinRequestById(joinRequestId);
 		Room room = joinRequest.getRoom();
 		validateRoomMember(user, room);
