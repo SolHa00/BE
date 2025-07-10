@@ -1,11 +1,20 @@
 package server.ourhood.domain.invitation.domain;
 
 public enum InvitationStatus {
-	PENDING,  // 대기
-	ACCEPTED, // 수락
-	REJECTED;  // 거절
+	REQUESTED,
+	ACCEPTED,
+	REJECTED,
+	CANCELED;
 
-	public static InvitationStatus fromName(String status) {
-		return InvitationStatus.valueOf(status.toUpperCase());
+	public boolean isAccepted() {
+		return this == ACCEPTED;
+	}
+
+	public boolean isRejected() {
+		return this == REJECTED;
+	}
+
+	public boolean isCanceled() {
+		return this == CANCELED;
 	}
 }
