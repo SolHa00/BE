@@ -1,5 +1,7 @@
 package server.ourhood.domain.join.domain;
 
+import static server.ourhood.global.exception.BaseResponseStatus.*;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +19,7 @@ import lombok.NoArgsConstructor;
 import server.ourhood.domain.common.BaseTimeEntity;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
+import server.ourhood.global.exception.BaseException;
 
 @Entity(name = "join_request")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,8 +32,8 @@ public class JoinRequest extends BaseTimeEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+	@JoinColumn(name = "requester_id")
+	private User requester;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "room_id")
@@ -41,13 +44,48 @@ public class JoinRequest extends BaseTimeEntity {
 	private JoinRequestStatus status;
 
 	@Builder
-	public JoinRequest(User user, Room room) {
-		this.user = user;
+	public JoinRequest(User requester, Room room) {
+		this.requester = requester;
 		this.room = room;
-		this.status = JoinRequestStatus.PENDING;
+		this.status = JoinRequestStatus.REQUESTED;
 	}
 
-	public void changeStatus(JoinRequestStatus status) {
-		this.status = status;
+	public void accept() {
+		validateAccept(status);
+		status = JoinRequestStatus.ACCEPTED;
+	}
+
+	private void validateAccept(JoinRequestStatus status) {
+		if (status.isCanceled() || status.isRejected()) {
+			throw new BaseException(ALREADY_PROCESSED_JOIN_REQUEST);
+		}
+	}
+
+	public void reject() {
+		validateReject(status);
+		status = JoinRequestStatus.REJECTED;
+	}
+
+	private void validateReject(JoinRequestStatus status) {
+		if (status.isCanceled() || status.isAccepted()) {
+			throw new BaseException(ALREADY_PROCESSED_JOIN_REQUEST);
+		}
+	}
+
+	public void cancel() {
+		validateCancel(status);
+		this.status = JoinRequestStatus.CANCELED;
+	}
+
+	private void validateCancel(JoinRequestStatus status) {
+		if (status.isAccepted() || status.isRejected()) {
+			throw new BaseException(ALREADY_PROCESSED_JOIN_REQUEST);
+		}
+	}
+
+	public void validateRequester(User user) {
+		if (!requester.equals(user)) {
+			throw new BaseException(NOT_ROOM_REQUESTER);
+		}
 	}
 }

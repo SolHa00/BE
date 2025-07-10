@@ -1,15 +1,12 @@
 package server.ourhood.domain.join.controller;
 
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
-import server.ourhood.domain.join.dto.request.ProcessJoinRequestRequest;
 import server.ourhood.domain.join.dto.response.JoinRequestCreateResponse;
 import server.ourhood.domain.join.service.JoinRequestService;
 import server.ourhood.domain.user.domain.User;
@@ -29,16 +26,21 @@ public class JoinRequestController {
 		return BaseResponse.success(response);
 	}
 
-	@PutMapping("/api/join-requests/{joinRequestId}")
-	public BaseResponse<Void> processJoinRequest(@LoginUser User user, @PathVariable Long joinRequestId,
-		@RequestBody ProcessJoinRequestRequest request) {
-		joinRequestService.processJoinRequest(user, joinRequestId, request);
+	@PostMapping("/api/join-requests/{joinRequestId}/accept")
+	public BaseResponse<Void> acceptJoinRequest(@LoginUser User user, @PathVariable Long joinRequestId) {
+		joinRequestService.accept(user, joinRequestId);
 		return BaseResponse.success();
 	}
 
-	@DeleteMapping("/api/join-requests/{joinRequestId}")
-	public BaseResponse<Void> removeJoinRequest(@LoginUser User user, @PathVariable Long joinRequestId) {
-		joinRequestService.deleteJoinRequest(user, joinRequestId);
+	@PostMapping("/api/join-requests/{joinRequestId}/reject")
+	public BaseResponse<Void> rejectJoinRequest(@LoginUser User user, @PathVariable Long joinRequestId) {
+		joinRequestService.reject(user, joinRequestId);
+		return BaseResponse.success();
+	}
+
+	@PostMapping("/api/join-requests/{joinRequestId}/cancel")
+	public BaseResponse<Void> cancelJoinRequest(@LoginUser User user, @PathVariable Long joinRequestId) {
+		joinRequestService.cancel(user, joinRequestId);
 		return BaseResponse.success();
 	}
 }

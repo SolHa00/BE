@@ -5,9 +5,9 @@ import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 
 public class InvitationConverter {
-	public static Invitation toInvitation(User invitedUser, Room room) {
+	public static Invitation toInvitation(User invitee, Room room) {
 		return Invitation.builder()
-			.user(invitedUser)
+			.invitee(invitee)
 			.room(room)
 			.build();
 	}
