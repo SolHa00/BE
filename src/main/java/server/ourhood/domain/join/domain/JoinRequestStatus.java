@@ -1,11 +1,20 @@
 package server.ourhood.domain.join.domain;
 
 public enum JoinRequestStatus {
-	PENDING,  // 대기
-	ACCEPTED, // 수락
-	REJECTED;  // 거절
+	REQUESTED,
+	ACCEPTED,
+	REJECTED,
+	CANCELED;
 
-	public static JoinRequestStatus fromName(String status) {
-		return JoinRequestStatus.valueOf(status.toUpperCase());
+	public boolean isAccepted() {
+		return this == ACCEPTED;
+	}
+
+	public boolean isRejected() {
+		return this == REJECTED;
+	}
+
+	public boolean isCanceled() {
+		return this == CANCELED;
 	}
 }

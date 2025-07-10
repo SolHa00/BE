@@ -38,9 +38,9 @@ public enum BaseResponseStatus {
 	NOT_ROOM_HOST(40302, HttpStatus.FORBIDDEN, "Room Host만 해당 작업을 수행할 수 있습니다."),
 	NOT_MOMENT_OWNER(40303, HttpStatus.FORBIDDEN, "Moment 소유자만 해당 작업을 수행할 수 있습니다."),
 	NOT_COMMENT_OWNER(40304, HttpStatus.FORBIDDEN, "Comment 소유자만 해당 작업을 수행할 수 있습니다."),
-	NOT_JOIN_REQUEST_OWNER(40305, HttpStatus.FORBIDDEN, "Join Request 소유자만 해당 작업을 수행할 수 있습니다."),
-	NOT_ROOM_MEMBER(40306, HttpStatus.FORBIDDEN, "Room 멤버만 해당 작업을 수행할 수 있습니다."),
-	NOT_ROOM_INVITER(40307, HttpStatus.FORBIDDEN, "Room에 초대 받은 사용자만 해당 작업을 수행할 수 있습니다."),
+	NOT_ROOM_MEMBER(40305, HttpStatus.FORBIDDEN, "Room 멤버만 해당 작업을 수행할 수 있습니다."),
+	NOT_ROOM_REQUESTER(40306, HttpStatus.FORBIDDEN, "참여 요청을 보낸 사용자만 해당 작업을 수행할 수 있습니다."),
+	NOT_ROOM_INVITER(40307, HttpStatus.FORBIDDEN, "초대 받은 사용자만 해당 작업을 수행할 수 있습니다."),
 
 	/**
 	 * 404 NOT_FOUND 잘못된 리소스 접근
@@ -56,17 +56,20 @@ public enum BaseResponseStatus {
 	NOT_FOUND_INVITATION(40408, HttpStatus.NOT_FOUND, "존재하지 않는 Invitation입니다."),
 
 	/**
-	 * 422 UNPROCESSABLE_ENTITY
-	 */
-	UNPROCESSABLE_ENTITY(422, HttpStatus.UNPROCESSABLE_ENTITY, "UNPROCESSABLE_ENTITY"),
-	INVALID_COMMENT_LEVEL(42201, HttpStatus.UNPROCESSABLE_ENTITY, "대댓글에는 댓글을 달 수 없습니다."),
-
-	/**
 	 * 409 CONFLICT 중복된 리소스
 	 */
 	CONFLICT(409, HttpStatus.CONFLICT, "중복된 리소스"),
 	CONFLICT_JOIN_REQUEST(40901, HttpStatus.CONFLICT, "이미 해당 방에 참여 요청을 보냈습니다."),
 	CONFLICT_INVITATION(40902, HttpStatus.CONFLICT, "이미 해당 사용자에게 초대 요청을 보냈습니다."),
+	ALREADY_PROCESSED_INVITATION(40903, HttpStatus.CONFLICT, "이미 처리된 초대 요청입니다."),
+	ALREADY_PROCESSED_JOIN_REQUEST(40904, HttpStatus.CONFLICT, "이미 처리된 참여 요청입니다."),
+	ALREADY_MEMBER_IN_ROOM(40905, HttpStatus.CONFLICT, "이미 해당 방에 속해있는 사용자입니다."),
+
+	/**
+	 * 422 UNPROCESSABLE_ENTITY
+	 */
+	UNPROCESSABLE_ENTITY(422, HttpStatus.UNPROCESSABLE_ENTITY, "UNPROCESSABLE_ENTITY"),
+	INVALID_COMMENT_LEVEL(42201, HttpStatus.UNPROCESSABLE_ENTITY, "대댓글에는 댓글을 달 수 없습니다."),
 
 	/**
 	 * 5XX Error

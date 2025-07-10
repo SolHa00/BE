@@ -5,9 +5,9 @@ import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 
 public class JoinRequestConverter {
-	public static JoinRequest toJoinRequest(User user, Room room) {
+	public static JoinRequest toJoinRequest(User requester, Room room) {
 		return JoinRequest.builder()
-			.user(user)
+			.requester(requester)
 			.room(room)
 			.build();
 	}

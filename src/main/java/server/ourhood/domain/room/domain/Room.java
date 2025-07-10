@@ -19,6 +19,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import server.ourhood.domain.common.BaseTimeEntity;
 import server.ourhood.domain.user.domain.User;
+import server.ourhood.global.exception.BaseException;
+import server.ourhood.global.exception.BaseResponseStatus;
 
 @Entity(name = "room")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -66,5 +68,16 @@ public class Room extends BaseTimeEntity {
 		this.roomName = roomName;
 		this.roomDescription = roomDescription;
 		this.thumbnailImageUrl = thumbnailImageUrl;
+	}
+
+	public void validateRoomMember(User user) {
+		if (!isMember(user)) {
+			throw new BaseException(BaseResponseStatus.NOT_ROOM_MEMBER);
+		}
+	}
+
+	public boolean isMember(User user) {
+		return this.roomMembers.stream()
+			.anyMatch(member -> member.getUser().getId().equals(user.getId()));
 	}
 }
