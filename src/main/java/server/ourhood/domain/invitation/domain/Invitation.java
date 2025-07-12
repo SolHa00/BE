@@ -12,6 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +22,8 @@ import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
 
-@Entity(name = "invitation")
+@Entity
+@Table(name = "invitation")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Invitation extends BaseTimeEntity {
