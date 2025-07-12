@@ -10,5 +10,5 @@ import server.ourhood.domain.user.domain.User;
 
 @Repository
 public interface JoinRequestRepository extends JpaRepository<JoinRequest, Long> {
-	boolean existsByUserAndRoomAndStatus(User user, Room room, JoinRequestStatus status);
+	boolean existsByRequesterAndRoomAndStatus(User requester, Room room, JoinRequestStatus status);
 }

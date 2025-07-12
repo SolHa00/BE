@@ -57,7 +57,7 @@ public class InvitationService {
 	 * 중복 초대 요청 검증
 	 */
 	private void validateIfAlreadyRequested(Room room, User invitee) {
-		if (invitationRepository.existsByUserAndRoomAndStatus(invitee, room, InvitationStatus.REQUESTED)) {
+		if (invitationRepository.existsByInviteeAndRoomAndStatus(invitee, room, InvitationStatus.REQUESTED)) {
 			throw new BaseException(CONFLICT_INVITATION);
 		}
 	}
