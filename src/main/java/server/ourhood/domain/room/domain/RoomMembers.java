@@ -8,6 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +17,13 @@ import lombok.NoArgsConstructor;
 import server.ourhood.domain.common.BaseTimeEntity;
 import server.ourhood.domain.user.domain.User;
 
-@Entity(name = "room_members")
+@Entity
+@Table(name = "room_members", uniqueConstraints = {
+	@UniqueConstraint(
+		name = "room_user_unique",
+		columnNames = {"room_id", "user_id"}
+	)
+})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class RoomMembers extends BaseTimeEntity {

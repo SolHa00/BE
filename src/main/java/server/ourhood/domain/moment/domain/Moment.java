@@ -13,6 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +23,8 @@ import server.ourhood.domain.common.BaseTimeEntity;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 
-@Entity(name = "moment")
+@Entity
+@Table(name = "moment")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Moment extends BaseTimeEntity {

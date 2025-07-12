@@ -9,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import server.ourhood.domain.auth.domain.OAuthIdentifier;
@@ -16,6 +17,7 @@ import server.ourhood.domain.common.BaseTimeEntity;
 
 @Entity
 @Table(name = "users")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class User extends BaseTimeEntity {

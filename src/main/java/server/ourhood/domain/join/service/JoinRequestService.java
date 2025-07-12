@@ -53,7 +53,7 @@ public class JoinRequestService {
 	 * 중복 참여 요청 검증
 	 */
 	private void validateIfAlreadyRequested(Room room, User requester) {
-		if (joinRequestRepository.existsByUserAndRoomAndStatus(requester, room, JoinRequestStatus.REQUESTED)) {
+		if (joinRequestRepository.existsByRequesterAndRoomAndStatus(requester, room, JoinRequestStatus.REQUESTED)) {
 			throw new BaseException(CONFLICT_JOIN_REQUEST);
 		}
 	}

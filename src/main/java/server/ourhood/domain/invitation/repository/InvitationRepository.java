@@ -10,5 +10,5 @@ import server.ourhood.domain.user.domain.User;
 
 @Repository
 public interface InvitationRepository extends JpaRepository<Invitation, Long> {
-	boolean existsByUserAndRoomAndStatus(User invitedUser, Room room, InvitationStatus status);
+	boolean existsByInviteeAndRoomAndStatus(User invitee, Room room, InvitationStatus status);
 }
