@@ -7,7 +7,7 @@ import server.ourhood.domain.user.domain.User;
 public class MomentConverter {
 	public static Moment toMoment(String momentImageUrl, String momentDescription, Room room, User user) {
 		return Moment.builder()
-			.imageUrl(momentImageUrl)
+			.momentImageUrl(momentImageUrl)
 			.momentDescription(momentDescription)
 			.room(room)
 			.user(user)

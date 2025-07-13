@@ -1,5 +1,7 @@
 package server.ourhood.domain.moment.domain;
 
+import static server.ourhood.global.exception.BaseResponseStatus.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,7 @@ import server.ourhood.domain.comment.domain.Comment;
 import server.ourhood.domain.common.BaseTimeEntity;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
+import server.ourhood.global.exception.BaseException;
 
 @Entity
 @Table(name = "moment")
@@ -34,8 +37,8 @@ public class Moment extends BaseTimeEntity {
 	@Column(name = "moment_id")
 	private Long id;
 
-	@Column(name = "image_url", nullable = false)
-	private String imageUrl;
+	@Column(name = "moment_image_url", nullable = false)
+	private String momentImageUrl;
 
 	@Column(name = "moment_description")
 	private String momentDescription;
@@ -52,14 +55,24 @@ public class Moment extends BaseTimeEntity {
 	private List<Comment> comments = new ArrayList<>();
 
 	@Builder
-	public Moment(String imageUrl, String momentDescription, Room room, User user) {
-		this.imageUrl = imageUrl;
+	public Moment(String momentImageUrl, String momentDescription, Room room, User user) {
+		this.momentImageUrl = momentImageUrl;
 		this.momentDescription = momentDescription;
 		this.room = room;
 		this.user = user;
 	}
 
-	public void update(String momentDescription) {
+	public void updateDescription(String momentDescription) {
 		this.momentDescription = momentDescription;
+	}
+
+	public void validateMomentOwner(User user) {
+		if (!isMomentOwner(user)) {
+			throw new BaseException(NOT_MOMENT_OWNER);
+		}
+	}
+
+	public boolean isMomentOwner(User user) {
+		return this.user.getId().equals(user.getId());
 	}
 }

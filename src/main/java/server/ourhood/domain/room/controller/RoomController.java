@@ -1,11 +1,14 @@
 package server.ourhood.domain.room.controller;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
@@ -24,14 +27,17 @@ public class RoomController {
 	private final RoomService roomService;
 
 	@PostMapping
-	public BaseResponse<RoomCreateResponse> addRoom(@LoginUser User user, RoomCreateRequest request) {
-		RoomCreateResponse response = roomService.createRoom(user, request);
+	public BaseResponse<RoomCreateResponse> addRoom(@LoginUser User user, @ModelAttribute RoomCreateRequest request,
+		@RequestPart(required = false) MultipartFile thumbnailImage) {
+		RoomCreateResponse response = roomService.createRoom(user, request, thumbnailImage);
 		return BaseResponse.success(response);
 	}
 
 	@PutMapping("/{roomId}")
-	public BaseResponse<Void> fixRoom(@LoginUser User user, @PathVariable Long roomId, RoomUpdateRequest request) {
-		roomService.updateRoom(user, roomId, request);
+	public BaseResponse<Void> fixRoom(@LoginUser User user, @PathVariable Long roomId,
+		@ModelAttribute RoomUpdateRequest request,
+		@RequestPart(required = false) MultipartFile thumbnailImage) {
+		roomService.updateRoom(user, roomId, request, thumbnailImage);
 		return BaseResponse.success();
 	}
 

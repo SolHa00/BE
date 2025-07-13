@@ -1,12 +1,15 @@
 package server.ourhood.domain.moment.controller;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
@@ -25,8 +28,10 @@ public class MomentController {
 	private final MomentService momentService;
 
 	@PostMapping
-	public BaseResponse<MomentCreateResponse> addMoment(@LoginUser User user, MomentCreateRequest request) {
-		MomentCreateResponse response = momentService.createMoment(user, request);
+	public BaseResponse<MomentCreateResponse> addMoment(@LoginUser User user,
+		@ModelAttribute MomentCreateRequest request,
+		@RequestPart MultipartFile momentImage) {
+		MomentCreateResponse response = momentService.createMoment(user, request, momentImage);
 		return BaseResponse.success(response);
 	}
 

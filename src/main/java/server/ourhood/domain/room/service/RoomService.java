@@ -1,5 +1,7 @@
 package server.ourhood.domain.room.service;
 
+import static server.ourhood.global.exception.BaseResponseStatus.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +16,6 @@ import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.room.repository.RoomRepository;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
-import server.ourhood.global.exception.BaseResponseStatus;
 import server.ourhood.global.s3.S3Service;
 
 @Service
@@ -27,14 +28,14 @@ public class RoomService {
 	@Transactional(readOnly = true)
 	public Room findRoomById(Long roomId) {
 		return roomRepository.findById(roomId)
-			.orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_ROOM));
+			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
 	}
 
 	@Transactional
-	public RoomCreateResponse createRoom(User host, RoomCreateRequest request) {
+	public RoomCreateResponse createRoom(User host, RoomCreateRequest request, MultipartFile thumbnailImage) {
 		String thumbnailImageUrl = null;
-		if (hasRoomThumbnail(request.thumbnail())) {
-			thumbnailImageUrl = s3Service.upload(request.thumbnail());
+		if (thumbnailImage != null && !thumbnailImage.isEmpty()) {
+			thumbnailImageUrl = s3Service.upload(thumbnailImage);
 		}
 		Room room = RoomConverter.toRoom(request.roomName(), request.roomDescription(), thumbnailImageUrl, host);
 		room.addRoomMember(host);
@@ -43,27 +44,33 @@ public class RoomService {
 	}
 
 	@Transactional
-	public void updateRoom(User user, Long roomId, RoomUpdateRequest request) {
+	public void updateRoom(User user, Long roomId, RoomUpdateRequest request, MultipartFile thumbnailImage) {
 		Room room = findRoomById(roomId);
-		if (!isUserRoomHost(user, room)) {
-			throw new BaseException(BaseResponseStatus.NOT_ROOM_HOST);
-		}
-		String thumbnailImageUrl = room.getThumbnailImageUrl();
-		if (hasRoomThumbnail(request.thumbnail())) {
-			if (thumbnailImageUrl != null) {
-				s3Service.deleteFile(thumbnailImageUrl);
+		room.validateRoomHost(user);
+		handleImageUpdate(room, request.isImageRemoved(), thumbnailImage);
+		room.updateDetails(request.roomName(), request.roomDescription());
+	}
+
+	private void handleImageUpdate(Room room, Boolean isImageRemoved, MultipartFile newThumbnailImage) {
+		String oldThumbnailImage = room.getThumbnailImageUrl();
+		if (newThumbnailImage != null && !newThumbnailImage.isEmpty()) {
+			String newThumbnailImageUrl = s3Service.upload(newThumbnailImage);
+			if (oldThumbnailImage != null && !oldThumbnailImage.isEmpty()) {
+				s3Service.deleteFile(oldThumbnailImage);
 			}
-			thumbnailImageUrl = s3Service.upload(request.thumbnail());
+			room.updateThumbnailImageUrl(newThumbnailImageUrl);
+		} else if (Boolean.TRUE.equals(isImageRemoved)) {
+			if (oldThumbnailImage != null && !oldThumbnailImage.isEmpty()) {
+				s3Service.deleteFile(oldThumbnailImage);
+			}
+			room.updateThumbnailImageUrl(null);
 		}
-		room.update(request.roomName(), request.roomDescription(), thumbnailImageUrl);
 	}
 
 	@Transactional
 	public void deleteRoom(User user, Long roomId) {
 		Room room = findRoomById(roomId);
-		if (!isUserRoomHost(user, room)) {
-			throw new BaseException(BaseResponseStatus.NOT_ROOM_HOST);
-		}
+		room.validateRoomHost(user);
 		if (room.getThumbnailImageUrl() != null) {
 			s3Service.deleteFile(room.getThumbnailImageUrl());
 		}
@@ -73,21 +80,11 @@ public class RoomService {
 	@Transactional
 	public void leaveRoom(User user, Long roomId) {
 		Room room = findRoomById(roomId);
-		if (isUserRoomHost(user, room)) {
-			throw new BaseException(BaseResponseStatus.HOST_CANNOT_LEAVE_ROOM);
-		}
+		room.validateRoomHost(user);
 		RoomMembers memberToRemove = room.getRoomMembers().stream()
 			.filter(member -> member.getUser().getId().equals(user.getId()))
 			.findFirst()
-			.orElseThrow(() -> new BaseException(BaseResponseStatus.USER_NOT_IN_ROOM));
+			.orElseThrow(() -> new BaseException(USER_NOT_IN_ROOM));
 		room.getRoomMembers().remove(memberToRemove);
-	}
-
-	private boolean hasRoomThumbnail(MultipartFile thumbnail) {
-		return thumbnail != null && !thumbnail.isEmpty();
-	}
-
-	private boolean isUserRoomHost(User user, Room room) {
-		return room.getHost().getId().equals(user.getId());
 	}
 }
