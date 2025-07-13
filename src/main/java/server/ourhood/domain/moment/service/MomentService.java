@@ -1,5 +1,7 @@
 package server.ourhood.domain.moment.service;
 
+import static server.ourhood.global.exception.BaseResponseStatus.*;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +17,6 @@ import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.service.RoomService;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
-import server.ourhood.global.exception.BaseResponseStatus;
 import server.ourhood.global.s3.S3Service;
 
 @Service
@@ -29,13 +30,13 @@ public class MomentService {
 	@Transactional(readOnly = true)
 	public Moment findMomentById(Long momentId) {
 		return momentRepository.findById(momentId)
-			.orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_MOMENT));
+			.orElseThrow(() -> new BaseException(NOT_FOUND_MOMENT));
 	}
 
 	@Transactional
-	public MomentCreateResponse createMoment(User user, MomentCreateRequest request) {
+	public MomentCreateResponse createMoment(User user, MomentCreateRequest request, MultipartFile momentImage) {
 		Room room = roomService.findRoomById(request.roomId());
-		String momentImageUrl = uploadMomentImage(request.momentImage());
+		String momentImageUrl = s3Service.upload(momentImage);
 		Moment moment = MomentConverter.toMoment(momentImageUrl, request.momentDescription(), room, user);
 		momentRepository.save(moment);
 		return new MomentCreateResponse(moment.getId());
@@ -44,25 +45,15 @@ public class MomentService {
 	@Transactional
 	public void updateMoment(User user, Long momentId, MomentUpdateRequest request) {
 		Moment moment = findMomentById(momentId);
-		validateMomentOwner(user, moment);
-		moment.update(request.momentDescription());
+		moment.validateMomentOwner(user);
+		moment.updateDescription(request.momentDescription());
 	}
 
 	@Transactional
 	public void deleteMoment(User user, Long momentId) {
 		Moment moment = findMomentById(momentId);
-		validateMomentOwner(user, moment);
-		s3Service.deleteFile(moment.getImageUrl());
+		moment.validateMomentOwner(user);
+		s3Service.deleteFile(moment.getMomentImageUrl());
 		momentRepository.delete(moment);
-	}
-
-	private void validateMomentOwner(User user, Moment moment) {
-		if (!moment.getUser().getId().equals(user.getId())) {
-			throw new BaseException(BaseResponseStatus.NOT_MOMENT_OWNER);
-		}
-	}
-
-	private String uploadMomentImage(MultipartFile image) {
-		return s3Service.upload(image);
 	}
 }

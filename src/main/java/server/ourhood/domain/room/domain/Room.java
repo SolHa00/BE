@@ -1,5 +1,7 @@
 package server.ourhood.domain.room.domain;
 
+import static server.ourhood.global.exception.BaseResponseStatus.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,7 +23,6 @@ import lombok.NoArgsConstructor;
 import server.ourhood.domain.common.BaseTimeEntity;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
-import server.ourhood.global.exception.BaseResponseStatus;
 
 @Entity
 @Table(name = "room")
@@ -66,20 +67,33 @@ public class Room extends BaseTimeEntity {
 		this.roomMembers.add(roomMembers);
 	}
 
-	public void update(String roomName, String roomDescription, String thumbnailImageUrl) {
+	public void updateDetails(String roomName, String roomDescription) {
 		this.roomName = roomName;
 		this.roomDescription = roomDescription;
+	}
+
+	public void updateThumbnailImageUrl(String thumbnailImageUrl) {
 		this.thumbnailImageUrl = thumbnailImageUrl;
 	}
 
 	public void validateRoomMember(User user) {
 		if (!isMember(user)) {
-			throw new BaseException(BaseResponseStatus.NOT_ROOM_MEMBER);
+			throw new BaseException(NOT_ROOM_MEMBER);
 		}
 	}
 
 	public boolean isMember(User user) {
 		return this.roomMembers.stream()
 			.anyMatch(member -> member.getUser().getId().equals(user.getId()));
+	}
+
+	public void validateRoomHost(User user) {
+		if (!isHost(user)) {
+			throw new BaseException(NOT_ROOM_HOST);
+		}
+	}
+
+	public boolean isHost(User user) {
+		return this.host.getId().equals(user.getId());
 	}
 }
