@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -16,7 +17,12 @@ import server.ourhood.domain.auth.domain.OAuthIdentifier;
 import server.ourhood.domain.common.BaseTimeEntity;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", uniqueConstraints = {
+	@UniqueConstraint(
+		name = "oauth_identifier_unique",
+		columnNames = {"oauth_id", "oauth_type"}
+	)
+})
 @EqualsAndHashCode(of = "id", callSuper = false)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
