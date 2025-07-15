@@ -53,34 +53,22 @@ public class JoinRequest extends BaseTimeEntity {
 	}
 
 	public void accept() {
-		validateAccept(status);
+		validateProcessable();
 		status = JoinRequestStatus.ACCEPTED;
 	}
 
-	private void validateAccept(JoinRequestStatus status) {
-		if (status.isCanceled() || status.isRejected()) {
-			throw new BaseException(ALREADY_PROCESSED_JOIN_REQUEST);
-		}
-	}
-
 	public void reject() {
-		validateReject(status);
+		validateProcessable();
 		status = JoinRequestStatus.REJECTED;
 	}
 
-	private void validateReject(JoinRequestStatus status) {
-		if (status.isCanceled() || status.isAccepted()) {
-			throw new BaseException(ALREADY_PROCESSED_JOIN_REQUEST);
-		}
-	}
-
 	public void cancel() {
-		validateCancel(status);
+		validateProcessable();
 		this.status = JoinRequestStatus.CANCELED;
 	}
 
-	private void validateCancel(JoinRequestStatus status) {
-		if (status.isAccepted() || status.isRejected()) {
+	private void validateProcessable() {
+		if (this.status != JoinRequestStatus.REQUESTED) {
 			throw new BaseException(ALREADY_PROCESSED_JOIN_REQUEST);
 		}
 	}

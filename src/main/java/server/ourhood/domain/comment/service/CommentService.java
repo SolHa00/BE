@@ -1,5 +1,9 @@
 package server.ourhood.domain.comment.service;
 
+import static server.ourhood.global.exception.BaseResponseStatus.*;
+
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,7 +18,6 @@ import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.domain.moment.service.MomentService;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
-import server.ourhood.global.exception.BaseResponseStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -26,19 +29,22 @@ public class CommentService {
 	@Transactional(readOnly = true)
 	public Comment findCommentById(Long commentId) {
 		return commentRepository.findById(commentId)
-			.orElseThrow(() -> new BaseException(BaseResponseStatus.NOT_FOUND_COMMENT));
+			.orElseThrow(() -> new BaseException(NOT_FOUND_COMMENT));
 	}
 
 	@Transactional
 	public CommentCreateResponse createComment(CommentCreateRequest request, User user) {
 		Moment moment = momentService.findMomentById(request.momentId());
-		Comment parent = null;
-		if (request.parentId() != null) {
-			parent = findCommentById(request.parentId());
+		Optional<Comment> parentOptional = Optional.ofNullable(request.parentId())
+			.map(this::findCommentById);
+
+		parentOptional.ifPresent(parent -> {
 			if (parent.isReply()) {
-				throw new BaseException(BaseResponseStatus.INVALID_COMMENT_LEVEL);
+				throw new BaseException(INVALID_COMMENT_LEVEL);
 			}
-		}
+		});
+
+		Comment parent = parentOptional.orElse(null);
 		Comment comment = CommentConverter.toComment(user, moment, request.commentContent(), parent);
 		commentRepository.save(comment);
 		return new CommentCreateResponse(comment.getId());
@@ -47,20 +53,14 @@ public class CommentService {
 	@Transactional
 	public void updateComment(Long commentId, CommentUpdateRequest request, User user) {
 		Comment comment = findCommentById(commentId);
-		validateCommentOwner(comment, user);
+		comment.validateCommentOwner(user);
 		comment.updateContent(request.commentContent());
 	}
 
 	@Transactional
 	public void deleteComment(Long commentId, User user) {
 		Comment comment = findCommentById(commentId);
-		validateCommentOwner(comment, user);
+		comment.validateCommentOwner(user);
 		commentRepository.delete(comment);
-	}
-
-	private void validateCommentOwner(Comment comment, User user) {
-		if (!comment.getUser().getId().equals(user.getId())) {
-			throw new BaseException(BaseResponseStatus.NOT_COMMENT_OWNER);
-		}
 	}
 }

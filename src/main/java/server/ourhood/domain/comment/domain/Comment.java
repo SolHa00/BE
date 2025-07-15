@@ -1,5 +1,7 @@
 package server.ourhood.domain.comment.domain;
 
+import static server.ourhood.global.exception.BaseResponseStatus.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,7 @@ import lombok.NoArgsConstructor;
 import server.ourhood.domain.common.BaseTimeEntity;
 import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.domain.user.domain.User;
+import server.ourhood.global.exception.BaseException;
 
 @Entity
 @Table(name = "comment")
@@ -65,5 +68,15 @@ public class Comment extends BaseTimeEntity {
 
 	public boolean isReply() {
 		return this.parent != null;
+	}
+
+	public void validateCommentOwner(User user) {
+		if (!isCommentOwner(user)) {
+			throw new BaseException(NOT_COMMENT_OWNER);
+		}
+	}
+
+	public boolean isCommentOwner(User user) {
+		return this.user.getId().equals(user.getId());
 	}
 }
