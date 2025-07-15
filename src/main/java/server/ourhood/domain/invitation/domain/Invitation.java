@@ -53,34 +53,22 @@ public class Invitation extends BaseTimeEntity {
 	}
 
 	public void accept() {
-		validateAccept(status);
+		validateProcessable();
 		status = InvitationStatus.ACCEPTED;
 	}
 
-	private void validateAccept(InvitationStatus status) {
-		if (status.isCanceled() || status.isRejected()) {
-			throw new BaseException(ALREADY_PROCESSED_INVITATION);
-		}
-	}
-
 	public void reject() {
-		validateReject(status);
+		validateProcessable();
 		status = InvitationStatus.REJECTED;
 	}
 
-	private void validateReject(InvitationStatus status) {
-		if (status.isCanceled() || status.isAccepted()) {
-			throw new BaseException(ALREADY_PROCESSED_INVITATION);
-		}
-	}
-
 	public void cancel() {
-		validateCancel(status);
+		validateProcessable();
 		this.status = InvitationStatus.CANCELED;
 	}
 
-	private void validateCancel(InvitationStatus status) {
-		if (status.isAccepted() || status.isRejected()) {
+	private void validateProcessable() {
+		if (this.status != InvitationStatus.REQUESTED) {
 			throw new BaseException(ALREADY_PROCESSED_INVITATION);
 		}
 	}
