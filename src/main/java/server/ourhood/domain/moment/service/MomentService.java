@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
-import server.ourhood.domain.moment.converter.MomentConverter;
 import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
 import server.ourhood.domain.moment.dto.request.MomentUpdateRequest;
@@ -37,7 +36,7 @@ public class MomentService {
 	public MomentCreateResponse createMoment(User user, MomentCreateRequest request, MultipartFile momentImage) {
 		Room room = roomService.findRoomById(request.roomId());
 		String momentImageUrl = s3Service.upload(momentImage);
-		Moment moment = MomentConverter.toMoment(momentImageUrl, request.momentDescription(), room, user);
+		Moment moment = request.toMoment(momentImageUrl, room, user);
 		momentRepository.save(moment);
 		return new MomentCreateResponse(moment.getId());
 	}
@@ -45,14 +44,14 @@ public class MomentService {
 	@Transactional
 	public void updateMoment(User user, Long momentId, MomentUpdateRequest request) {
 		Moment moment = findMomentById(momentId);
-		moment.validateMomentOwner(user);
+		moment.validateOwner(user);
 		moment.updateDescription(request.momentDescription());
 	}
 
 	@Transactional
 	public void deleteMoment(User user, Long momentId) {
 		Moment moment = findMomentById(momentId);
-		moment.validateMomentOwner(user);
+		moment.validateOwner(user);
 		s3Service.deleteFile(moment.getMomentImageUrl());
 		momentRepository.delete(moment);
 	}

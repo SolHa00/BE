@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
-import server.ourhood.domain.room.converter.RoomConverter;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.domain.RoomMembers;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
@@ -37,7 +36,7 @@ public class RoomService {
 		if (thumbnailImage != null && !thumbnailImage.isEmpty()) {
 			thumbnailImageUrl = s3Service.upload(thumbnailImage);
 		}
-		Room room = RoomConverter.toRoom(request.roomName(), request.roomDescription(), thumbnailImageUrl, host);
+		Room room = request.toRoom(thumbnailImageUrl, host);
 		room.addRoomMember(host);
 		roomRepository.save(room);
 		return new RoomCreateResponse(room.getId());
@@ -78,7 +77,7 @@ public class RoomService {
 	}
 
 	@Transactional
-	public void leaveRoom(User user, Long roomId) {
+	public void leave(User user, Long roomId) {
 		Room room = findRoomById(roomId);
 		room.validateRoomHost(user);
 		RoomMembers memberToRemove = room.getRoomMembers().stream()

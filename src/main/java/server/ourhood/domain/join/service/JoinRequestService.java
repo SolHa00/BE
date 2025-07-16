@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import server.ourhood.domain.join.converter.JoinRequestConverter;
 import server.ourhood.domain.join.domain.JoinRequest;
 import server.ourhood.domain.join.domain.JoinRequestStatus;
 import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
@@ -35,7 +34,7 @@ public class JoinRequestService {
 		Room room = roomService.findRoomById(request.roomId());
 		validateIfAlreadyRoomMember(room, requester);
 		validateIfAlreadyRequested(room, requester);
-		JoinRequest joinRequest = JoinRequestConverter.toJoinRequest(requester, room);
+		JoinRequest joinRequest = request.toJoinRequest(requester, room);
 		joinRequestRepository.save(joinRequest);
 		return new JoinRequestCreateResponse(joinRequest.getId());
 	}

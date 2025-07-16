@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import server.ourhood.domain.invitation.converter.InvitationConverter;
 import server.ourhood.domain.invitation.domain.Invitation;
 import server.ourhood.domain.invitation.domain.InvitationStatus;
 import server.ourhood.domain.invitation.dto.request.InvitationCreateRequest;
@@ -39,7 +38,7 @@ public class InvitationService {
 		User invitee = userService.findUserByNickname(request.nickname());
 		validateIfAlreadyRoomMember(room, invitee);
 		validateIfAlreadyRequested(room, invitee);
-		Invitation invitation = InvitationConverter.toInvitation(invitee, room);
+		Invitation invitation = request.toInvitation(invitee, room);
 		invitationRepository.save(invitation);
 		return new InvitationCreateResponse(invitation.getId());
 	}
