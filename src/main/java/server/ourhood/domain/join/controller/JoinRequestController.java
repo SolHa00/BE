@@ -20,7 +20,7 @@ public class JoinRequestController {
 	private final JoinRequestService joinRequestService;
 
 	@PostMapping("/api/join-requests")
-	public BaseResponse<JoinRequestCreateResponse> addJoinRequest(@LoginUser User user,
+	public BaseResponse<JoinRequestCreateResponse> createJoinRequest(@LoginUser User user,
 		@RequestBody JoinRequestCreateRequest request) {
 		JoinRequestCreateResponse response = joinRequestService.createJoinRequest(user, request);
 		return BaseResponse.success(response);

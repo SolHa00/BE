@@ -25,21 +25,21 @@ public class CommentController {
 	private final CommentService commentService;
 
 	@PostMapping
-	public BaseResponse<CommentCreateResponse> addComment(@LoginUser User user,
+	public BaseResponse<CommentCreateResponse> createComment(@LoginUser User user,
 		@RequestBody CommentCreateRequest request) {
 		CommentCreateResponse response = commentService.createComment(request, user);
 		return BaseResponse.success(response);
 	}
 
 	@PutMapping("/{commentId}")
-	public BaseResponse<Void> fixComment(@LoginUser User user, @PathVariable Long commentId,
+	public BaseResponse<Void> updateComment(@LoginUser User user, @PathVariable Long commentId,
 		@RequestBody CommentUpdateRequest request) {
 		commentService.updateComment(commentId, request, user);
 		return BaseResponse.success();
 	}
 
 	@DeleteMapping("/{commentId}")
-	public BaseResponse<Void> removeComment(@LoginUser User user, @PathVariable Long commentId) {
+	public BaseResponse<Void> deleteComment(@LoginUser User user, @PathVariable Long commentId) {
 		commentService.deleteComment(commentId, user);
 		return BaseResponse.success();
 	}

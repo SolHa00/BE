@@ -20,7 +20,7 @@ public class InvitationController {
 	private final InvitationService invitationService;
 
 	@PostMapping("/api/invitations")
-	public BaseResponse<InvitationCreateResponse> addInvitation(@LoginUser User user,
+	public BaseResponse<InvitationCreateResponse> createInvitation(@LoginUser User user,
 		@RequestBody InvitationCreateRequest request) {
 		InvitationCreateResponse response = invitationService.createInvitation(user, request);
 		return BaseResponse.success(response);
