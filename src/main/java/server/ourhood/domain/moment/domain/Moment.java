@@ -66,13 +66,9 @@ public class Moment extends BaseTimeEntity {
 		this.momentDescription = momentDescription;
 	}
 
-	public void validateMomentOwner(User user) {
-		if (!isMomentOwner(user)) {
+	public void validateOwner(User user) {
+		if (!this.user.equals(user)) {
 			throw new BaseException(NOT_MOMENT_OWNER);
 		}
-	}
-
-	public boolean isMomentOwner(User user) {
-		return this.user.getId().equals(user.getId());
 	}
 }

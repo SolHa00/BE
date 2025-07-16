@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
-import server.ourhood.domain.comment.converter.CommentConverter;
 import server.ourhood.domain.comment.domain.Comment;
 import server.ourhood.domain.comment.dto.request.CommentCreateRequest;
 import server.ourhood.domain.comment.dto.request.CommentUpdateRequest;
@@ -35,17 +34,16 @@ public class CommentService {
 	@Transactional
 	public CommentCreateResponse createComment(CommentCreateRequest request, User user) {
 		Moment moment = momentService.findMomentById(request.momentId());
-		Optional<Comment> parentOptional = Optional.ofNullable(request.parentId())
-			.map(this::findCommentById);
-
-		parentOptional.ifPresent(parent -> {
-			if (parent.isReply()) {
-				throw new BaseException(INVALID_COMMENT_LEVEL);
-			}
-		});
-
-		Comment parent = parentOptional.orElse(null);
-		Comment comment = CommentConverter.toComment(user, moment, request.commentContent(), parent);
+		Comment parent = Optional.ofNullable(request.parentId())
+			.map(this::findCommentById)
+			.map(p -> {
+				if (p.isReply()) {
+					throw new BaseException(INVALID_COMMENT_LEVEL);
+				}
+				return p;
+			})
+			.orElse(null);
+		Comment comment = request.toComment(user, moment, parent);
 		commentRepository.save(comment);
 		return new CommentCreateResponse(comment.getId());
 	}
@@ -53,14 +51,14 @@ public class CommentService {
 	@Transactional
 	public void updateComment(Long commentId, CommentUpdateRequest request, User user) {
 		Comment comment = findCommentById(commentId);
-		comment.validateCommentOwner(user);
+		comment.validateOwner(user);
 		comment.updateContent(request.commentContent());
 	}
 
 	@Transactional
 	public void deleteComment(Long commentId, User user) {
 		Comment comment = findCommentById(commentId);
-		comment.validateCommentOwner(user);
+		comment.validateOwner(user);
 		commentRepository.delete(comment);
 	}
 }

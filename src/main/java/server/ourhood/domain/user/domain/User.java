@@ -36,12 +36,6 @@ public class User extends BaseTimeEntity {
 	@Embedded
 	private OAuthIdentifier oauthIdentifier;
 
-	@Column(name = "name")
-	private String name;
-
-	@Column(name = "profile_image_url")
-	private String profileImageUrl;
-
 	@Column(name = "nickname", unique = true)
 	private String nickname;
 
@@ -49,14 +43,9 @@ public class User extends BaseTimeEntity {
 	private String email;
 
 	@Builder
-	public User(OAuthIdentifier oauthIdentifier, String name, String nickname, String email) {
+	public User(OAuthIdentifier oauthIdentifier, String nickname, String email) {
 		this.oauthIdentifier = oauthIdentifier;
-		this.name = name;
 		this.nickname = nickname;
 		this.email = email;
-	}
-
-	public void updateProfileImage(String profileImageUrl) {
-		this.profileImageUrl = profileImageUrl;
 	}
 }

@@ -1,5 +1,6 @@
 package server.ourhood.domain.moment.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,8 +28,8 @@ public class MomentController {
 
 	private final MomentService momentService;
 
-	@PostMapping
-	public BaseResponse<MomentCreateResponse> addMoment(@LoginUser User user,
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public BaseResponse<MomentCreateResponse> createMoment(@LoginUser User user,
 		@ModelAttribute MomentCreateRequest request,
 		@RequestPart MultipartFile momentImage) {
 		MomentCreateResponse response = momentService.createMoment(user, request, momentImage);
@@ -36,14 +37,14 @@ public class MomentController {
 	}
 
 	@PutMapping("/{momentId}")
-	public BaseResponse<Void> fixMoment(@LoginUser User user, @PathVariable Long momentId,
+	public BaseResponse<Void> updateMoment(@LoginUser User user, @PathVariable Long momentId,
 		@RequestBody MomentUpdateRequest request) {
 		momentService.updateMoment(user, momentId, request);
 		return BaseResponse.success();
 	}
 
 	@DeleteMapping("/{momentId}")
-	public BaseResponse<Void> removeMoment(@LoginUser User user, @PathVariable Long momentId) {
+	public BaseResponse<Void> deleteMoment(@LoginUser User user, @PathVariable Long momentId) {
 		momentService.deleteMoment(user, momentId);
 		return BaseResponse.success();
 	}

@@ -1,5 +1,6 @@
 package server.ourhood.domain.room.controller;
 
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,15 +27,15 @@ public class RoomController {
 
 	private final RoomService roomService;
 
-	@PostMapping
-	public BaseResponse<RoomCreateResponse> addRoom(@LoginUser User user, @ModelAttribute RoomCreateRequest request,
+	@PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public BaseResponse<RoomCreateResponse> createRoom(@LoginUser User user, @ModelAttribute RoomCreateRequest request,
 		@RequestPart(required = false) MultipartFile thumbnailImage) {
 		RoomCreateResponse response = roomService.createRoom(user, request, thumbnailImage);
 		return BaseResponse.success(response);
 	}
 
-	@PutMapping("/{roomId}")
-	public BaseResponse<Void> fixRoom(@LoginUser User user, @PathVariable Long roomId,
+	@PutMapping(value = "/{roomId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public BaseResponse<Void> updateRoom(@LoginUser User user, @PathVariable Long roomId,
 		@ModelAttribute RoomUpdateRequest request,
 		@RequestPart(required = false) MultipartFile thumbnailImage) {
 		roomService.updateRoom(user, roomId, request, thumbnailImage);
@@ -42,14 +43,14 @@ public class RoomController {
 	}
 
 	@DeleteMapping("/{roomId}")
-	public BaseResponse<Void> removeRoom(@LoginUser User user, @PathVariable Long roomId) {
+	public BaseResponse<Void> deleteRoom(@LoginUser User user, @PathVariable Long roomId) {
 		roomService.deleteRoom(user, roomId);
 		return BaseResponse.success();
 	}
 
 	@DeleteMapping("/{roomId}/leave")
 	public BaseResponse<Void> leaveRoom(@LoginUser User user, @PathVariable Long roomId) {
-		roomService.leaveRoom(user, roomId);
+		roomService.leave(user, roomId);
 		return BaseResponse.success();
 	}
 }
