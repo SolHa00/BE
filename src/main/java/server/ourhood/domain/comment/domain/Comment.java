@@ -70,13 +70,9 @@ public class Comment extends BaseTimeEntity {
 		return this.parent != null;
 	}
 
-	public void validateCommentOwner(User user) {
-		if (!isCommentOwner(user)) {
+	public void validateOwner(User user) {
+		if (!this.user.equals(user)) {
 			throw new BaseException(NOT_COMMENT_OWNER);
 		}
-	}
-
-	public boolean isCommentOwner(User user) {
-		return this.user.getId().equals(user.getId());
 	}
 }
