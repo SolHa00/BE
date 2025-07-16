@@ -37,7 +37,7 @@ public class KakaoUserClient implements UserClient {
 			.build();
 
 		return User.builder()
-			.name(response.kakaoAccount().nickname())
+			.nickname(response.kakaoAccount().nickname())
 			.email(response.kakaoAccount().email())
 			.oauthIdentifier(oAuthIdentifier)
 			.build();
