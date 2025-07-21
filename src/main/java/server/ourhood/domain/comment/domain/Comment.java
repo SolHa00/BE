@@ -40,10 +40,6 @@ public class Comment extends BaseTimeEntity {
 	private String content;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
-
-	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "moment_id")
 	private Moment moment;
 
@@ -51,15 +47,28 @@ public class Comment extends BaseTimeEntity {
 	@JoinColumn(name = "parent_id")
 	private Comment parent;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "owner_id")
+	private User owner;
+
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> children = new ArrayList<>();
 
 	@Builder
-	public Comment(User user, String content, Moment moment, Comment parent) {
-		this.user = user;
+	public Comment(String content, Moment moment, Comment parent, User owner) {
 		this.content = content;
 		this.moment = moment;
+		this.owner = owner;
 		this.parent = parent;
+	}
+
+	public static Comment createComment(String content, Moment moment, Comment parent, User owner) {
+		return Comment.builder()
+			.content(content)
+			.moment(moment)
+			.owner(owner)
+			.parent(parent)
+			.build();
 	}
 
 	public void updateContent(String content) {
@@ -71,7 +80,7 @@ public class Comment extends BaseTimeEntity {
 	}
 
 	public void validateOwner(User user) {
-		if (!this.user.equals(user)) {
+		if (!this.owner.equals(user)) {
 			throw new BaseException(NOT_COMMENT_OWNER);
 		}
 	}

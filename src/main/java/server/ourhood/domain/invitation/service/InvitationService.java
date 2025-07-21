@@ -38,9 +38,9 @@ public class InvitationService {
 		User invitee = userService.findUserByNickname(request.nickname());
 		validateIfAlreadyRoomMember(room, invitee);
 		validateIfAlreadyRequested(room, invitee);
-		Invitation invitation = request.toInvitation(invitee, room);
+		Invitation invitation = Invitation.createInvitation(room, invitee);
 		invitationRepository.save(invitation);
-		return new InvitationCreateResponse(invitation.getId());
+		return InvitationCreateResponse.of(invitation.getId());
 	}
 
 	/**

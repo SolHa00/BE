@@ -34,22 +34,29 @@ public class Invitation extends BaseTimeEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "invitee_id")
-	private User invitee;
-
-	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "room_id")
 	private Room room;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "invitee_id")
+	private User invitee;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private InvitationStatus status;
 
 	@Builder
-	public Invitation(User invitee, Room room) {
-		this.invitee = invitee;
+	public Invitation(Room room, User invitee) {
 		this.room = room;
+		this.invitee = invitee;
 		this.status = InvitationStatus.REQUESTED;
+	}
+
+	public static Invitation createInvitation(Room room, User invitee) {
+		return Invitation.builder()
+			.room(room)
+			.invitee(invitee)
+			.build();
 	}
 
 	public void accept() {

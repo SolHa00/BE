@@ -34,22 +34,29 @@ public class JoinRequest extends BaseTimeEntity {
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "requester_id")
-	private User requester;
-
-	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "room_id")
 	private Room room;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "requester_id")
+	private User requester;
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private JoinRequestStatus status;
 
 	@Builder
-	public JoinRequest(User requester, Room room) {
-		this.requester = requester;
+	public JoinRequest(Room room, User requester) {
 		this.room = room;
+		this.requester = requester;
 		this.status = JoinRequestStatus.REQUESTED;
+	}
+
+	public static JoinRequest createJoinRequest(Room room, User requester) {
+		return JoinRequest.builder()
+			.room(room)
+			.requester(requester)
+			.build();
 	}
 
 	public void accept() {
