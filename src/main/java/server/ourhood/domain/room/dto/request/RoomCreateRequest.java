@@ -1,18 +1,11 @@
 package server.ourhood.domain.room.dto.request;
 
-import server.ourhood.domain.room.domain.Room;
-import server.ourhood.domain.user.domain.User;
+import jakarta.validation.constraints.NotBlank;
 
 public record RoomCreateRequest(
+	@NotBlank(message = "방 이름은 비워둘 수 없습니다.")
 	String roomName,
-	String roomDescription
+	String roomDescription,
+	String thumbnailImageKey
 ) {
-	public Room toRoom(String thumbnailImageUrl, User host) {
-		return Room.builder()
-			.roomName(this.roomName)
-			.roomDescription(this.roomDescription)
-			.thumbnailImageUrl(thumbnailImageUrl)
-			.host(host)
-			.build();
-	}
 }

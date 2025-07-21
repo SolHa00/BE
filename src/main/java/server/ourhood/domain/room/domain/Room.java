@@ -35,14 +35,14 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "room_id")
 	private Long id;
 
-	@Column(name = "room_name", nullable = false)
-	private String roomName;
+	@Column(name = "name", nullable = false)
+	private String name;
 
-	@Column(name = "room_description")
-	private String roomDescription;
+	@Column(name = "description")
+	private String description;
 
-	@Column(name = "thumbnail_image_url")
-	private String thumbnailImageUrl;
+	@Column(name = "image_key", length = 36)
+	private String imageKey;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "host_id")
@@ -52,11 +52,20 @@ public class Room extends BaseTimeEntity {
 	private List<RoomMembers> roomMembers = new ArrayList<>();
 
 	@Builder
-	public Room(String roomName, String roomDescription, String thumbnailImageUrl, User host) {
-		this.roomName = roomName;
-		this.roomDescription = roomDescription;
-		this.thumbnailImageUrl = thumbnailImageUrl;
+	public Room(String name, String description, String imageKey, User host) {
+		this.name = name;
+		this.description = description;
+		this.imageKey = imageKey;
 		this.host = host;
+	}
+
+	public static Room createRoom(String name, String description, String imageKey, User host) {
+		return Room.builder()
+			.name(name)
+			.description(description)
+			.imageKey(imageKey)
+			.host(host)
+			.build();
 	}
 
 	public void addRoomMember(User user) {
@@ -67,13 +76,13 @@ public class Room extends BaseTimeEntity {
 		this.roomMembers.add(roomMembers);
 	}
 
-	public void updateDetails(String roomName, String roomDescription) {
-		this.roomName = roomName;
-		this.roomDescription = roomDescription;
+	public void updateDetails(String name, String description) {
+		this.name = name;
+		this.description = description;
 	}
 
-	public void updateThumbnailImageUrl(String thumbnailImageUrl) {
-		this.thumbnailImageUrl = thumbnailImageUrl;
+	public void updateImageKey(String imageKey) {
+		this.imageKey = imageKey;
 	}
 
 	public void validateRoomMember(User user) {
