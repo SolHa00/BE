@@ -1,19 +1,13 @@
 package server.ourhood.domain.moment.dto.request;
 
-import server.ourhood.domain.moment.domain.Moment;
-import server.ourhood.domain.room.domain.Room;
-import server.ourhood.domain.user.domain.User;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 public record MomentCreateRequest(
+	@NotNull(message = "방 ID는 비워둘 수 없습니다.")
 	Long roomId,
-	String momentDescription
+	String momentDescription,
+	@NotBlank(message = "모먼트 이미지 키는 비워둘 수 없습니다.")
+	String momentImageKey
 ) {
-	public Moment toMoment(String momentImageUrl, Room room, User user) {
-		return Moment.builder()
-			.momentImageUrl(momentImageUrl)
-			.momentDescription(this.momentDescription)
-			.room(room)
-			.user(user)
-			.build();
-	}
 }

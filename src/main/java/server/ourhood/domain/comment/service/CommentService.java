@@ -32,7 +32,7 @@ public class CommentService {
 	}
 
 	@Transactional
-	public CommentCreateResponse createComment(CommentCreateRequest request, User user) {
+	public CommentCreateResponse createComment(User user, CommentCreateRequest request) {
 		Moment moment = momentService.findMomentById(request.momentId());
 		Comment parent = Optional.ofNullable(request.parentId())
 			.map(this::findCommentById)
@@ -43,20 +43,25 @@ public class CommentService {
 				return p;
 			})
 			.orElse(null);
-		Comment comment = request.toComment(user, moment, parent);
+		Comment comment = Comment.createComment(
+			request.commentContent(),
+			moment,
+			parent,
+			user
+		);
 		commentRepository.save(comment);
-		return new CommentCreateResponse(comment.getId());
+		return CommentCreateResponse.of(comment.getId());
 	}
 
 	@Transactional
-	public void updateComment(Long commentId, CommentUpdateRequest request, User user) {
+	public void updateComment(User user, Long commentId, CommentUpdateRequest request) {
 		Comment comment = findCommentById(commentId);
 		comment.validateOwner(user);
 		comment.updateContent(request.commentContent());
 	}
 
 	@Transactional
-	public void deleteComment(Long commentId, User user) {
+	public void deleteComment(User user, Long commentId) {
 		Comment comment = findCommentById(commentId);
 		comment.validateOwner(user);
 		commentRepository.delete(comment);

@@ -1,16 +1,9 @@
 package server.ourhood.domain.join.dto.request;
 
-import server.ourhood.domain.join.domain.JoinRequest;
-import server.ourhood.domain.room.domain.Room;
-import server.ourhood.domain.user.domain.User;
+import jakarta.validation.constraints.NotNull;
 
 public record JoinRequestCreateRequest(
+	@NotNull(message = "방 ID는 비워둘 수 없습니다.")
 	Long roomId
 ) {
-	public JoinRequest toJoinRequest(User requester, Room room) {
-		return JoinRequest.builder()
-			.requester(requester)
-			.room(room)
-			.build();
-	}
 }

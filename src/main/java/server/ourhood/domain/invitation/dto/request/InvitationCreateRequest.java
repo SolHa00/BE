@@ -1,17 +1,10 @@
 package server.ourhood.domain.invitation.dto.request;
 
-import server.ourhood.domain.invitation.domain.Invitation;
-import server.ourhood.domain.room.domain.Room;
-import server.ourhood.domain.user.domain.User;
+import jakarta.validation.constraints.NotBlank;
 
 public record InvitationCreateRequest(
+	@NotBlank(message = "방 ID는 비워둘 수 없습니다.")
 	Long roomId,
 	String nickname
 ) {
-	public Invitation toInvitation(User invitee, Room room) {
-		return Invitation.builder()
-			.invitee(invitee)
-			.room(room)
-			.build();
-	}
 }

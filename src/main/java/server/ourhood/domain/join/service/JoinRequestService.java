@@ -34,9 +34,9 @@ public class JoinRequestService {
 		Room room = roomService.findRoomById(request.roomId());
 		validateIfAlreadyRoomMember(room, requester);
 		validateIfAlreadyRequested(room, requester);
-		JoinRequest joinRequest = request.toJoinRequest(requester, room);
+		JoinRequest joinRequest = JoinRequest.createJoinRequest(room, requester);
 		joinRequestRepository.save(joinRequest);
-		return new JoinRequestCreateResponse(joinRequest.getId());
+		return JoinRequestCreateResponse.of(joinRequest.getId());
 	}
 
 	/**

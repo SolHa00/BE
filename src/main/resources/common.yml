@@ -35,5 +35,8 @@ cloud:
       static: ap-northeast-2
     s3:
       bucket: ${S3_BUCKET}
-    stack:
-      auto: false
+    cloudfront:
+      distribution-domain: ${CLOUDFRONT_DISTRIBUTION_DOMAIN}
+      private-key-path: ${CLOUDFRONT_PRIVATE_KEY_PATH}
+      key-pair-id: ${CLOUDFRONT_KEY_PAIR_ID}
+      base-url: ${CLOUDFRONT_BASE_URL}

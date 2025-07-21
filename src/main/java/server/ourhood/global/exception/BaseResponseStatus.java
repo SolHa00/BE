@@ -19,6 +19,8 @@ public enum BaseResponseStatus {
 	 */
 	BAD_REQUEST(400, HttpStatus.BAD_REQUEST, "잘못된 요청"),
 	KAKAO_INVALID_AUTH_CODE(40001, HttpStatus.BAD_REQUEST, "카카오 인증 코드가 유효하지 않습니다."),
+	INVALID_IMAGE_FILE_EXTENSION(40002, HttpStatus.BAD_REQUEST, "올바른 이미지 확장자가 아닙니다."),
+	HOST_CANNOT_LEAVE_ROOM(40003, HttpStatus.BAD_REQUEST, "방장은 방을 나갈 수 없습니다."),
 
 	/**
 	 * 401 UNAUTHORIZED 권한없음(인증 실패)
@@ -34,7 +36,6 @@ public enum BaseResponseStatus {
 	 * 403 FORBIDDEN 권한없음
 	 */
 	FORBIDDEN(403, HttpStatus.FORBIDDEN, "접근 권한이 없음"),
-	HOST_CANNOT_LEAVE_ROOM(40301, HttpStatus.FORBIDDEN, "방장은 방을 나갈 수 없습니다."),
 	NOT_ROOM_HOST(40302, HttpStatus.FORBIDDEN, "Room Host만 해당 작업을 수행할 수 있습니다."),
 	NOT_MOMENT_OWNER(40303, HttpStatus.FORBIDDEN, "Moment 소유자만 해당 작업을 수행할 수 있습니다."),
 	NOT_COMMENT_OWNER(40304, HttpStatus.FORBIDDEN, "Comment 소유자만 해당 작업을 수행할 수 있습니다."),
@@ -54,6 +55,9 @@ public enum BaseResponseStatus {
 	NOT_FOUND_COMMENT(40406, HttpStatus.NOT_FOUND, "존재하지 않는 Comment입니다."),
 	NOT_FOUND_JOIN_REQUEST(40407, HttpStatus.NOT_FOUND, "존재하지 않는 Join Request입니다."),
 	NOT_FOUND_INVITATION(40408, HttpStatus.NOT_FOUND, "존재하지 않는 Invitation입니다."),
+	IMAGE_FILE_EXTENSION_NOT_FOUND(40409, HttpStatus.NOT_FOUND, "이미지 파일 확장자를 찾을 수 없습니다."),
+	NOT_FOUND_IMAGE(40410, HttpStatus.NOT_FOUND, "이미지를 찾을 수 없습니다."),
+	NOT_FOUND_IMAGE_FILE_IN_S3(40411, HttpStatus.NOT_FOUND, "해당 파일은 S3내에 존재하지 않습니다."),
 
 	/**
 	 * 409 CONFLICT 중복된 리소스

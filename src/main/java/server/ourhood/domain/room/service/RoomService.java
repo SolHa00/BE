@@ -4,9 +4,10 @@ import static server.ourhood.global.exception.BaseResponseStatus.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.image.domain.Image;
+import server.ourhood.domain.image.service.ImageService;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.domain.RoomMembers;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
@@ -15,14 +16,13 @@ import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.room.repository.RoomRepository;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
-import server.ourhood.global.s3.S3Service;
 
 @Service
 @RequiredArgsConstructor
 public class RoomService {
 
 	private final RoomRepository roomRepository;
-	private final S3Service s3Service;
+	private final ImageService imageService;
 
 	@Transactional(readOnly = true)
 	public Room findRoomById(Long roomId) {
@@ -31,47 +31,57 @@ public class RoomService {
 	}
 
 	@Transactional
-	public RoomCreateResponse createRoom(User host, RoomCreateRequest request, MultipartFile thumbnailImage) {
-		String thumbnailImageUrl = null;
-		if (thumbnailImage != null && !thumbnailImage.isEmpty()) {
-			thumbnailImageUrl = s3Service.upload(thumbnailImage);
-		}
-		Room room = request.toRoom(thumbnailImageUrl, host);
-		room.addRoomMember(host);
+	public RoomCreateResponse createRoom(User user, RoomCreateRequest request) {
+		Image thumbnailImage = imageService.findImageByKey(request.thumbnailImageKey());
+		Room room = Room.createRoom(
+			request.roomName(),
+			request.roomDescription(),
+			(thumbnailImage != null) ? thumbnailImage.getImageKey() : null,
+			user
+		);
+		room.addRoomMember(user);
 		roomRepository.save(room);
-		return new RoomCreateResponse(room.getId());
+		if (thumbnailImage != null) {
+			thumbnailImage.activate(room.getId());
+		}
+		return RoomCreateResponse.of(room.getId());
 	}
 
 	@Transactional
-	public void updateRoom(User user, Long roomId, RoomUpdateRequest request, MultipartFile thumbnailImage) {
+	public void updateRoom(User user, Long roomId, RoomUpdateRequest request) {
 		Room room = findRoomById(roomId);
 		room.validateRoomHost(user);
-		handleImageUpdate(room, request.isImageRemoved(), thumbnailImage);
+		handleImageUpdate(room, request.isImageRemoved(), request.newThumbnailImageKey());
 		room.updateDetails(request.roomName(), request.roomDescription());
+		roomRepository.save(room);
 	}
 
-	private void handleImageUpdate(Room room, Boolean isImageRemoved, MultipartFile newThumbnailImage) {
-		String oldThumbnailImage = room.getThumbnailImageUrl();
-		if (newThumbnailImage != null && !newThumbnailImage.isEmpty()) {
-			String newThumbnailImageUrl = s3Service.upload(newThumbnailImage);
-			if (oldThumbnailImage != null && !oldThumbnailImage.isEmpty()) {
-				s3Service.deleteFile(oldThumbnailImage);
+	private void handleImageUpdate(Room room, Boolean imageRemoved, String newThumbnailImageKey) {
+		String oldThumbnailImageKey = room.getImageKey();
+		if (newThumbnailImageKey != null && !newThumbnailImageKey.isBlank()) {
+			// Case 1: 새로운 썸네일 이미지를 설정하는 경우
+			if (oldThumbnailImageKey != null) {
+				imageService.deleteImageByKey(oldThumbnailImageKey);
 			}
-			room.updateThumbnailImageUrl(newThumbnailImageUrl);
-		} else if (Boolean.TRUE.equals(isImageRemoved)) {
-			if (oldThumbnailImage != null && !oldThumbnailImage.isEmpty()) {
-				s3Service.deleteFile(oldThumbnailImage);
+			Image newThumbnailImage = imageService.findImageByKey(newThumbnailImageKey);
+			newThumbnailImage.activate(room.getId());
+			room.updateImageKey(newThumbnailImageKey);
+		} else if (Boolean.TRUE.equals(imageRemoved)) {
+			// Case 2: 기존 썸네일 이미지를 제거하는 경우
+			if (oldThumbnailImageKey != null) {
+				imageService.deleteImageByKey(oldThumbnailImageKey);
 			}
-			room.updateThumbnailImageUrl(null);
+			room.updateImageKey(null);
 		}
+		// Case 3: 이미지 변경 없음
 	}
 
 	@Transactional
 	public void deleteRoom(User user, Long roomId) {
 		Room room = findRoomById(roomId);
 		room.validateRoomHost(user);
-		if (room.getThumbnailImageUrl() != null) {
-			s3Service.deleteFile(room.getThumbnailImageUrl());
+		if (room.getImageKey() != null) {
+			imageService.deleteImageByKey(room.getImageKey());
 		}
 		roomRepository.delete(room);
 	}
@@ -79,7 +89,9 @@ public class RoomService {
 	@Transactional
 	public void leave(User user, Long roomId) {
 		Room room = findRoomById(roomId);
-		room.validateRoomHost(user);
+		if (room.isHost(user)) {
+			throw new BaseException(HOST_CANNOT_LEAVE_ROOM);
+		}
 		RoomMembers memberToRemove = room.getRoomMembers().stream()
 			.filter(member -> member.getUser().getId().equals(user.getId()))
 			.findFirst()
