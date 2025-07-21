@@ -37,37 +37,46 @@ public class Moment extends BaseTimeEntity {
 	@Column(name = "moment_id")
 	private Long id;
 
-	@Column(name = "moment_image_url", nullable = false)
-	private String momentImageUrl;
+	@Column(name = "image_key", length = 36, nullable = false)
+	private String imageKey;
 
-	@Column(name = "moment_description")
-	private String momentDescription;
+	@Column(name = "description")
+	private String description;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "room_id")
 	private Room room;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "user_id")
-	private User user;
+	@JoinColumn(name = "owner_id")
+	private User owner;
 
 	@OneToMany(mappedBy = "moment", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Comment> comments = new ArrayList<>();
 
 	@Builder
-	public Moment(String momentImageUrl, String momentDescription, Room room, User user) {
-		this.momentImageUrl = momentImageUrl;
-		this.momentDescription = momentDescription;
+	public Moment(String imageKey, String description, Room room, User owner) {
+		this.imageKey = imageKey;
+		this.description = description;
 		this.room = room;
-		this.user = user;
+		this.owner = owner;
 	}
 
-	public void updateDescription(String momentDescription) {
-		this.momentDescription = momentDescription;
+	public static Moment createMoment(String imageKey, String description, Room room, User owner) {
+		return Moment.builder()
+			.imageKey(imageKey)
+			.description(description)
+			.room(room)
+			.owner(owner)
+			.build();
+	}
+
+	public void updateDescription(String description) {
+		this.description = description;
 	}
 
 	public void validateOwner(User user) {
-		if (!this.user.equals(user)) {
+		if (!this.owner.equals(user)) {
 			throw new BaseException(NOT_MOMENT_OWNER);
 		}
 	}

@@ -4,9 +4,10 @@ import static server.ourhood.global.exception.BaseResponseStatus.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.image.domain.Image;
+import server.ourhood.domain.image.service.ImageService;
 import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
 import server.ourhood.domain.moment.dto.request.MomentUpdateRequest;
@@ -16,7 +17,6 @@ import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.service.RoomService;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
-import server.ourhood.global.s3.S3Service;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +24,7 @@ public class MomentService {
 
 	private final MomentRepository momentRepository;
 	private final RoomService roomService;
-	private final S3Service s3Service;
+	private final ImageService imageService;
 
 	@Transactional(readOnly = true)
 	public Moment findMomentById(Long momentId) {
@@ -33,12 +33,18 @@ public class MomentService {
 	}
 
 	@Transactional
-	public MomentCreateResponse createMoment(User user, MomentCreateRequest request, MultipartFile momentImage) {
+	public MomentCreateResponse createMoment(User user, MomentCreateRequest request) {
 		Room room = roomService.findRoomById(request.roomId());
-		String momentImageUrl = s3Service.upload(momentImage);
-		Moment moment = request.toMoment(momentImageUrl, room, user);
+		Image image = imageService.findImageByKey(request.momentImageKey());
+		Moment moment = Moment.createMoment(
+			image.getImageKey(),
+			request.momentDescription(),
+			room,
+			user
+		);
 		momentRepository.save(moment);
-		return new MomentCreateResponse(moment.getId());
+		image.activate(moment.getId());
+		return MomentCreateResponse.of(moment.getId());
 	}
 
 	@Transactional
@@ -52,7 +58,7 @@ public class MomentService {
 	public void deleteMoment(User user, Long momentId) {
 		Moment moment = findMomentById(momentId);
 		moment.validateOwner(user);
-		s3Service.deleteFile(moment.getMomentImageUrl());
+		imageService.deleteImageByKey(moment.getImageKey());
 		momentRepository.delete(moment);
 	}
 }
