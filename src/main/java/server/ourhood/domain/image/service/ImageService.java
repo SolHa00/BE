@@ -39,14 +39,8 @@ public class ImageService {
 		String imageKey = uuidGenerator.generateUUID();
 		Image image = Image.createImage(imageType, imageKey, imageFileExtension, user);
 		imageRepository.save(image);
-		String fileName = createFileName(
-			image.getImageType(),
-			image.getOwner().getId(),
-			image.getImageKey(),
-			image.getImageFileExtension());
-		String presignedUrl = s3Util.getS3PresignedUrl(
-			fileName,
-			HttpMethod.PUT,
+		String fileName = image.getFileName();
+		String presignedUrl = s3Util.getS3PresignedUrl(fileName, HttpMethod.PUT,
 			imageFileExtension.getUploadExtension());
 		return PresignedUrlResponse.of(imageKey, presignedUrl);
 	}
@@ -60,16 +54,6 @@ public class ImageService {
 		} catch (IllegalArgumentException e) {
 			throw new BaseException(INVALID_IMAGE_FILE_EXTENSION);
 		}
-	}
-
-	private String createFileName(ImageType imageType, Long ownerId, String imageKey,
-		ImageFileExtension imageFileExtension) {
-		return String.format(
-			"%s/%d/%s.%s",
-			imageType.getValue(),
-			ownerId,
-			imageKey,
-			imageFileExtension.getUploadExtension());
 	}
 
 	@Transactional
@@ -87,11 +71,7 @@ public class ImageService {
 
 	public void deleteImageByKey(String imageKey) {
 		Image image = findImageByKey(imageKey);
-		String fileName = createFileName(
-			image.getImageType(),
-			image.getOwner().getId(),
-			image.getImageKey(),
-			image.getImageFileExtension());
+		String fileName = image.getFileName();
 		s3Util.deleteS3Object(fileName);
 		imageRepository.delete(image);
 	}
