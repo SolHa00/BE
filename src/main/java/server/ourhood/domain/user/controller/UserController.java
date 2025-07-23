@@ -1,0 +1,35 @@
+package server.ourhood.domain.user.controller;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.user.domain.User;
+import server.ourhood.domain.user.dto.request.UserNicknameUpdateRequest;
+import server.ourhood.domain.user.dto.response.UserInfoResponse;
+import server.ourhood.domain.user.service.UserService;
+import server.ourhood.global.auth.annotation.LoginUser;
+import server.ourhood.global.response.BaseResponse;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/api/users")
+public class UserController {
+
+	private final UserService userService;
+
+	@GetMapping("/me")
+	public BaseResponse<UserInfoResponse> getUserInfo(@LoginUser User user) {
+		UserInfoResponse response = userService.getUserInfo(user);
+		return BaseResponse.success(response);
+	}
+
+	@PutMapping("/nickname")
+	public BaseResponse<Void> updateUserNickname(@LoginUser User user, @RequestBody UserNicknameUpdateRequest request) {
+		userService.updateUserNickname(user.getId(), request);
+		return BaseResponse.success();
+	}
+}
