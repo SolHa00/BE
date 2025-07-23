@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.security.PrivateKey;
 import java.security.Security;
-import java.time.Instant;
-import java.util.Date;
 
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -16,8 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
-import com.amazonaws.services.cloudfront.util.SignerUtils;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -27,34 +23,24 @@ public class CloudFrontUtil {
 	private final String distributionDomain;
 	private final String keyPairId;
 	private final PrivateKey privateKey;
+	private final String baseUrl;
 
 	public CloudFrontUtil(
 		@Value("${cloud.aws.cloudfront.distribution-domain}") String distributionDomain,
 		@Value("${cloud.aws.cloudfront.key-pair-id}") String keyPairId,
-		@Value("${cloud.aws.cloudfront.private-key-path}") String privateKeyPath) {
+		@Value("${cloud.aws.cloudfront.private-key-path}") String privateKeyPath,
+		@Value("${cloud.aws.cloudfront.base-url}") String baseUrl) {
 		this.distributionDomain = distributionDomain;
 		this.keyPairId = keyPairId;
 		this.privateKey = loadPrivateKey(privateKeyPath);
+		this.baseUrl = baseUrl;
 	}
 
-	public String generateSignedUrl(String objectKey) {
-		try {
-			String resourcePath = SignerUtils.generateResourcePath(
-				SignerUtils.Protocol.https,
-				distributionDomain,
-				objectKey
-			);
-			Date expiration = Date.from(Instant.now().plusSeconds(60 * 10));
-			return com.amazonaws.services.cloudfront.CloudFrontUrlSigner.getSignedURLWithCannedPolicy(
-				resourcePath,
-				keyPairId,
-				privateKey,
-				expiration
-			);
-		} catch (Exception e) {
-			log.error("CloudFront 서명된 URL 생성에 실패했습니다. objectKey: {}", objectKey, e);
-			throw new RuntimeException("서명된 URL을 생성할 수 없습니다.");
+	public String getPublicUrl(String objectKey) {
+		if (objectKey == null || objectKey.isBlank()) {
+			return null;
 		}
+		return baseUrl + "/" + objectKey;
 	}
 
 	// BouncyCastle을 사용한 키 파싱
