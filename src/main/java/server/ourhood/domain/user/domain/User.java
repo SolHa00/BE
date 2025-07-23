@@ -48,4 +48,8 @@ public class User extends BaseTimeEntity {
 		this.nickname = nickname;
 		this.email = email;
 	}
+
+	public void updateNickname(String nickname) {
+		this.nickname = nickname;
+	}
 }
