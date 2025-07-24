@@ -71,12 +71,19 @@ public class Image extends BaseTimeEntity {
 		this.status = ImageStatus.ACTIVE;
 	}
 
-	public String getFileName() {
+	public String getPermanentFileName() {
 		return String.format(
 			"%s/%d/%s.%s",
 			this.imageType.getValue(),
 			this.owner.getId(),
 			this.imageKey,
 			this.imageFileExtension.getUploadExtension());
+	}
+
+	public String getTempFileName() {
+		return String.format(
+			"temp/%s",
+			getPermanentFileName()
+		);
 	}
 }
