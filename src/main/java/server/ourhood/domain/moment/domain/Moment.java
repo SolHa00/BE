@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -22,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import server.ourhood.domain.comment.domain.Comment;
 import server.ourhood.domain.common.BaseTimeEntity;
+import server.ourhood.domain.image.domain.Image;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
@@ -37,11 +39,12 @@ public class Moment extends BaseTimeEntity {
 	@Column(name = "moment_id")
 	private Long id;
 
-	@Column(name = "image_key", length = 36, nullable = false)
-	private String imageKey;
-
 	@Column(name = "description")
 	private String description;
+
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "image_id", nullable = false)
+	private Image image;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "room_id")
@@ -55,16 +58,16 @@ public class Moment extends BaseTimeEntity {
 	private List<Comment> comments = new ArrayList<>();
 
 	@Builder
-	public Moment(String imageKey, String description, Room room, User owner) {
-		this.imageKey = imageKey;
+	public Moment(Image image, String description, Room room, User owner) {
+		this.image = image;
 		this.description = description;
 		this.room = room;
 		this.owner = owner;
 	}
 
-	public static Moment createMoment(String imageKey, String description, Room room, User owner) {
+	public static Moment createMoment(Image image, String description, Room room, User owner) {
 		return Moment.builder()
-			.imageKey(imageKey)
+			.image(image)
 			.description(description)
 			.room(room)
 			.owner(owner)

@@ -36,14 +36,9 @@ public class MomentService {
 	public MomentCreateResponse createMoment(User user, MomentCreateRequest request) {
 		Room room = roomService.findRoomById(request.roomId());
 		Image image = imageService.findImageByKey(request.momentImageKey());
-		Moment moment = Moment.createMoment(
-			image.getImageKey(),
-			request.momentDescription(),
-			room,
-			user
-		);
+		image.activate();
+		Moment moment = Moment.createMoment(image, request.momentDescription(), room, user);
 		momentRepository.save(moment);
-		image.activate(moment.getId());
 		return MomentCreateResponse.of(moment.getId());
 	}
 
@@ -58,7 +53,7 @@ public class MomentService {
 	public void deleteMoment(User user, Long momentId) {
 		Moment moment = findMomentById(momentId);
 		moment.validateOwner(user);
-		imageService.deleteImageByKey(moment.getImageKey());
+		imageService.deleteImage(moment.getImage());
 		momentRepository.delete(moment);
 	}
 }
