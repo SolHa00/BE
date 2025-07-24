@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
 import server.ourhood.domain.join.dto.response.JoinRequestCreateResponse;
@@ -21,7 +22,7 @@ public class JoinRequestController {
 
 	@PostMapping("/api/join-requests")
 	public BaseResponse<JoinRequestCreateResponse> createJoinRequest(@LoginUser User user,
-		@RequestBody JoinRequestCreateRequest request) {
+		@Valid @RequestBody JoinRequestCreateRequest request) {
 		JoinRequestCreateResponse response = joinRequestService.createJoinRequest(user, request);
 		return BaseResponse.success(response);
 	}

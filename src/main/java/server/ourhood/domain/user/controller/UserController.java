@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.domain.user.dto.request.UserNicknameUpdateRequest;
@@ -28,7 +29,8 @@ public class UserController {
 	}
 
 	@PutMapping("/nickname")
-	public BaseResponse<Void> updateUserNickname(@LoginUser User user, @RequestBody UserNicknameUpdateRequest request) {
+	public BaseResponse<Void> updateUserNickname(@LoginUser User user,
+		@Valid @RequestBody UserNicknameUpdateRequest request) {
 		userService.updateUserNickname(user.getId(), request);
 		return BaseResponse.success();
 	}

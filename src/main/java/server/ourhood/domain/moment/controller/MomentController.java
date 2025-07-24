@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
 import server.ourhood.domain.moment.dto.request.MomentUpdateRequest;
@@ -26,7 +27,7 @@ public class MomentController {
 
 	@PostMapping
 	public BaseResponse<MomentCreateResponse> createMoment(@LoginUser User user,
-		@RequestBody MomentCreateRequest request) {
+		@Valid @RequestBody MomentCreateRequest request) {
 		MomentCreateResponse response = momentService.createMoment(user, request);
 		return BaseResponse.success(response);
 	}

@@ -33,17 +33,12 @@ public class RoomService {
 	@Transactional
 	public RoomCreateResponse createRoom(User user, RoomCreateRequest request) {
 		Image thumbnailImage = imageService.findImageByKey(request.thumbnailImageKey());
-		Room room = Room.createRoom(
-			request.roomName(),
-			request.roomDescription(),
-			(thumbnailImage != null) ? thumbnailImage.getImageKey() : null,
-			user
-		);
+		if (thumbnailImage != null) {
+			thumbnailImage.activate();
+		}
+		Room room = Room.createRoom(request.roomName(), request.roomDescription(), thumbnailImage, user);
 		room.addRoomMember(user);
 		roomRepository.save(room);
-		if (thumbnailImage != null) {
-			thumbnailImage.activate(room.getId());
-		}
 		return RoomCreateResponse.of(room.getId());
 	}
 
@@ -57,21 +52,21 @@ public class RoomService {
 	}
 
 	private void handleImageUpdate(Room room, Boolean imageRemoved, String newThumbnailImageKey) {
-		String oldThumbnailImageKey = room.getImageKey();
+		Image oldThumbnailImage = room.getThumbnailImage();
 		if (newThumbnailImageKey != null && !newThumbnailImageKey.isBlank()) {
 			// Case 1: 새로운 썸네일 이미지를 설정하는 경우
-			if (oldThumbnailImageKey != null) {
-				imageService.deleteImageByKey(oldThumbnailImageKey);
+			if (oldThumbnailImage != null) {
+				imageService.deleteImage(oldThumbnailImage);
 			}
 			Image newThumbnailImage = imageService.findImageByKey(newThumbnailImageKey);
-			newThumbnailImage.activate(room.getId());
-			room.updateImageKey(newThumbnailImageKey);
+			newThumbnailImage.activate();
+			room.updateThumbnailImage(newThumbnailImage);
 		} else if (Boolean.TRUE.equals(imageRemoved)) {
 			// Case 2: 기존 썸네일 이미지를 제거하는 경우
-			if (oldThumbnailImageKey != null) {
-				imageService.deleteImageByKey(oldThumbnailImageKey);
+			if (oldThumbnailImage != null) {
+				imageService.deleteImage(oldThumbnailImage);
 			}
-			room.updateImageKey(null);
+			room.updateThumbnailImage(null);
 		}
 		// Case 3: 이미지 변경 없음
 	}
@@ -80,8 +75,8 @@ public class RoomService {
 	public void deleteRoom(User user, Long roomId) {
 		Room room = findRoomById(roomId);
 		room.validateRoomHost(user);
-		if (room.getImageKey() != null) {
-			imageService.deleteImageByKey(room.getImageKey());
+		if (room.getThumbnailImage() != null) {
+			imageService.deleteImage(room.getThumbnailImage());
 		}
 		roomRepository.delete(room);
 	}

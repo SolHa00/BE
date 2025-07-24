@@ -15,12 +15,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import server.ourhood.domain.common.BaseTimeEntity;
+import server.ourhood.domain.image.domain.Image;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
 
@@ -41,8 +43,9 @@ public class Room extends BaseTimeEntity {
 	@Column(name = "description")
 	private String description;
 
-	@Column(name = "image_key", length = 36)
-	private String imageKey;
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "image_id")
+	private Image thumbnailImage;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "host_id")
@@ -52,18 +55,18 @@ public class Room extends BaseTimeEntity {
 	private List<RoomMembers> roomMembers = new ArrayList<>();
 
 	@Builder
-	public Room(String name, String description, String imageKey, User host) {
+	public Room(String name, String description, Image thumbnailImage, User host) {
 		this.name = name;
 		this.description = description;
-		this.imageKey = imageKey;
+		this.thumbnailImage = thumbnailImage;
 		this.host = host;
 	}
 
-	public static Room createRoom(String name, String description, String imageKey, User host) {
+	public static Room createRoom(String name, String description, Image thumbnailImage, User host) {
 		return Room.builder()
 			.name(name)
 			.description(description)
-			.imageKey(imageKey)
+			.thumbnailImage(thumbnailImage)
 			.host(host)
 			.build();
 	}
@@ -81,8 +84,8 @@ public class Room extends BaseTimeEntity {
 		this.description = description;
 	}
 
-	public void updateImageKey(String imageKey) {
-		this.imageKey = imageKey;
+	public void updateThumbnailImage(Image thumbnailImage) {
+		this.thumbnailImage = thumbnailImage;
 	}
 
 	public void validateRoomMember(User user) {

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
 import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
@@ -25,14 +26,15 @@ public class RoomController {
 	private final RoomService roomService;
 
 	@PostMapping
-	public BaseResponse<RoomCreateResponse> createRoom(@LoginUser User user, @RequestBody RoomCreateRequest request) {
+	public BaseResponse<RoomCreateResponse> createRoom(@LoginUser User user,
+		@Valid @RequestBody RoomCreateRequest request) {
 		RoomCreateResponse response = roomService.createRoom(user, request);
 		return BaseResponse.success(response);
 	}
 
 	@PutMapping("/{roomId}")
 	public BaseResponse<Void> updateRoom(@LoginUser User user, @PathVariable Long roomId,
-		@RequestBody RoomUpdateRequest request) {
+		@Valid @RequestBody RoomUpdateRequest request) {
 		roomService.updateRoom(user, roomId, request);
 		return BaseResponse.success();
 	}

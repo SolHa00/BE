@@ -33,9 +33,6 @@ public class Image extends BaseTimeEntity {
 	@Column(name = "image_type")
 	private ImageType imageType;
 
-	@Column(name = "target_id")
-	private Long targetId;
-
 	@Column(name = "image_key", length = 36, nullable = false, unique = true)
 	private String imageKey;
 
@@ -70,8 +67,7 @@ public class Image extends BaseTimeEntity {
 			.build();
 	}
 
-	public void activate(Long targetId) {
-		this.targetId = targetId;
+	public void activate() {
 		this.status = ImageStatus.ACTIVE;
 	}
 
