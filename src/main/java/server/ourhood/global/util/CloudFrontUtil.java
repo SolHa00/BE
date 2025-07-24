@@ -36,11 +36,11 @@ public class CloudFrontUtil {
 		this.baseUrl = baseUrl;
 	}
 
-	public String getPublicUrl(String objectKey) {
-		if (objectKey == null || objectKey.isBlank()) {
+	public String getPublicUrl(String fileName) {
+		if (fileName == null || fileName.isBlank()) {
 			return null;
 		}
-		return baseUrl + "/" + objectKey;
+		return baseUrl + "/" + fileName;
 	}
 
 	// BouncyCastle을 사용한 키 파싱
