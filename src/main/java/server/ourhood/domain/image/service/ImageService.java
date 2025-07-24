@@ -39,7 +39,7 @@ public class ImageService {
 		String imageKey = uuidGenerator.generateUUID();
 		Image image = Image.createImage(imageType, imageKey, imageFileExtension, user);
 		imageRepository.save(image);
-		String fileName = image.getFileName();
+		String fileName = image.getTempFileName();
 		String presignedUrl = s3Util.getS3PresignedUrl(fileName, HttpMethod.PUT,
 			imageFileExtension.getUploadExtension());
 		return PresignedUrlResponse.of(imageKey, presignedUrl);
@@ -69,9 +69,18 @@ public class ImageService {
 			.orElseThrow(() -> new BaseException(NOT_FOUND_IMAGE));
 	}
 
+	@Transactional
 	public void deleteImage(Image image) {
-		String fileName = image.getFileName();
+		String fileName = image.getPermanentFileName();
 		s3Util.deleteS3Object(fileName);
 		imageRepository.delete(image);
+	}
+
+	@Transactional
+	public void activateAndMoveImage(Image image) {
+		String tempKey = image.getTempFileName();
+		String permanentKey = image.getPermanentFileName();
+		s3Util.moveObject(tempKey, permanentKey);
+		image.activate();
 	}
 }
