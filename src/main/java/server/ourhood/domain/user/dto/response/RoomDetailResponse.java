@@ -4,7 +4,7 @@ import server.ourhood.domain.room.domain.Room;
 
 public record RoomDetailResponse(
 	String roomName,
-	String thumbnail
+	String thumbnailUrl
 ) {
 	public static RoomDetailResponse of(Room room, String thumbnailUrl) {
 		return new RoomDetailResponse(

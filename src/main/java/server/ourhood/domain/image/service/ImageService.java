@@ -69,8 +69,7 @@ public class ImageService {
 			.orElseThrow(() -> new BaseException(NOT_FOUND_IMAGE));
 	}
 
-	public void deleteImageByKey(String imageKey) {
-		Image image = findImageByKey(imageKey);
+	public void deleteImage(Image image) {
 		String fileName = image.getFileName();
 		s3Util.deleteS3Object(fileName);
 		imageRepository.delete(image);
