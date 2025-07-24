@@ -34,7 +34,7 @@ public class RoomService {
 	public RoomCreateResponse createRoom(User user, RoomCreateRequest request) {
 		Image thumbnailImage = imageService.findImageByKey(request.thumbnailImageKey());
 		if (thumbnailImage != null) {
-			thumbnailImage.activate();
+			imageService.activateAndMoveImage(thumbnailImage);
 		}
 		Room room = Room.createRoom(request.roomName(), request.roomDescription(), thumbnailImage, user);
 		room.addRoomMember(user);
@@ -59,7 +59,7 @@ public class RoomService {
 				imageService.deleteImage(oldThumbnailImage);
 			}
 			Image newThumbnailImage = imageService.findImageByKey(newThumbnailImageKey);
-			newThumbnailImage.activate();
+			imageService.activateAndMoveImage(newThumbnailImage);
 			room.updateThumbnailImage(newThumbnailImage);
 		} else if (Boolean.TRUE.equals(imageRemoved)) {
 			// Case 2: 기존 썸네일 이미지를 제거하는 경우

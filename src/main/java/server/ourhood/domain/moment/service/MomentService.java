@@ -36,7 +36,7 @@ public class MomentService {
 	public MomentCreateResponse createMoment(User user, MomentCreateRequest request) {
 		Room room = roomService.findRoomById(request.roomId());
 		Image image = imageService.findImageByKey(request.momentImageKey());
-		image.activate();
+		imageService.activateAndMoveImage(image);
 		Moment moment = Moment.createMoment(image, request.momentDescription(), room, user);
 		momentRepository.save(moment);
 		return MomentCreateResponse.of(moment.getId());

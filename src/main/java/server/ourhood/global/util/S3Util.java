@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.CopyObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 
@@ -41,5 +42,14 @@ public class S3Util {
 			throw new BaseException(BaseResponseStatus.NOT_FOUND_IMAGE_FILE_IN_S3);
 		}
 		amazonS3.deleteObject(new DeleteObjectRequest(bucketName, fileName));
+	}
+
+	public void moveObject(String sourceKey, String destinationKey) {
+		if (!amazonS3.doesObjectExist(bucketName, sourceKey)) {
+			throw new BaseException(BaseResponseStatus.NOT_FOUND_IMAGE_FILE_IN_S3);
+		}
+		CopyObjectRequest copyReq = new CopyObjectRequest(bucketName, sourceKey, bucketName, destinationKey);
+		amazonS3.copyObject(copyReq);
+		deleteS3Object(sourceKey);
 	}
 }
