@@ -12,6 +12,6 @@ import server.ourhood.domain.user.domain.User;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
-	@Query("SELECT r FROM Room r JOIN r.roomMembers rm WHERE rm.user = :user")
-	List<Room> findAllByMember(@Param("user") User user);
+	@Query("SELECT r FROM Room r LEFT JOIN FETCH r.thumbnailImage WHERE r IN (SELECT rm.room FROM RoomMembers rm WHERE rm.user = :user)")
+	List<Room> findAllByMemberWithThumbnail(@Param("user") User user);
 }

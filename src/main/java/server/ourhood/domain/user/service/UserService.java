@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.image.domain.Image;
-import server.ourhood.domain.image.service.ImageService;
 import server.ourhood.domain.invitation.domain.InvitationStatus;
 import server.ourhood.domain.invitation.repository.InvitationRepository;
 import server.ourhood.domain.join.domain.JoinRequestStatus;
@@ -35,7 +34,6 @@ public class UserService {
 	private final InvitationRepository invitationRepository;
 	private final JoinRequestRepository joinRequestRepository;
 	private final CloudFrontUtil cloudFrontUtil;
-	private final ImageService imageService;
 
 	@Transactional(readOnly = true)
 	public User findUserById(Long userId) {
@@ -51,9 +49,9 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public UserInfoResponse getUserInfo(User user) {
-		List<MyRoomResponse> myRooms = roomRepository.findAllByMember(user).stream()
+		List<MyRoomResponse> myRooms = roomRepository.findAllByMemberWithThumbnail(user).stream()
 			.map(room -> {
-				Image thumbnailImage = imageService.findImageByKey(room.getImageKey());
+				Image thumbnailImage = room.getThumbnailImage();
 				String thumbnailUrl =
 					(thumbnailImage != null) ? cloudFrontUtil.getPublicUrl(thumbnailImage.getFileName()) : null;
 				return MyRoomResponse.from(room, thumbnailUrl);
