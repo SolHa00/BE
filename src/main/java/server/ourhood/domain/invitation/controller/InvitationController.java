@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.invitation.dto.request.InvitationCreateRequest;
 import server.ourhood.domain.invitation.dto.response.InvitationCreateResponse;
@@ -21,7 +22,7 @@ public class InvitationController {
 
 	@PostMapping("/api/invitations")
 	public BaseResponse<InvitationCreateResponse> createInvitation(@LoginUser User user,
-		@RequestBody InvitationCreateRequest request) {
+		@Valid @RequestBody InvitationCreateRequest request) {
 		InvitationCreateResponse response = invitationService.createInvitation(user, request);
 		return BaseResponse.success(response);
 	}

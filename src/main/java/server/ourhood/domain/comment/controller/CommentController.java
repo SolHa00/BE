@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.comment.dto.request.CommentCreateRequest;
 import server.ourhood.domain.comment.dto.request.CommentUpdateRequest;
@@ -26,7 +27,7 @@ public class CommentController {
 
 	@PostMapping
 	public BaseResponse<CommentCreateResponse> createComment(@LoginUser User user,
-		@RequestBody CommentCreateRequest request) {
+		@Valid @RequestBody CommentCreateRequest request) {
 		CommentCreateResponse response = commentService.createComment(user, request);
 		return BaseResponse.success(response);
 	}
