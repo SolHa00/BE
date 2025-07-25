@@ -1,4 +1,4 @@
-package server.ourhood.domain.user.dto.response;
+package server.ourhood.domain.room.dto.response;
 
 import server.ourhood.domain.room.domain.Room;
 

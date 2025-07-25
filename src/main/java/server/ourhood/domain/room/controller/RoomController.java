@@ -1,6 +1,7 @@
 package server.ourhood.domain.room.controller;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -12,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
 import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
+import server.ourhood.domain.room.dto.response.GetRoomResponse;
 import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.room.service.RoomService;
 import server.ourhood.domain.user.domain.User;
@@ -49,5 +51,11 @@ public class RoomController {
 	public BaseResponse<Void> leaveRoom(@LoginUser User user, @PathVariable Long roomId) {
 		roomService.leave(user, roomId);
 		return BaseResponse.success();
+	}
+
+	@GetMapping("/{roomId}")
+	public BaseResponse<GetRoomResponse> getRoomInfo(@LoginUser User user, @PathVariable Long roomId) {
+		GetRoomResponse response = roomService.getRoomInfo(user, roomId);
+		return BaseResponse.success(response);
 	}
 }

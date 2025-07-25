@@ -49,22 +49,22 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public UserInfoResponse getUserInfo(User user) {
-		List<MyRoomResponse> myRooms = roomRepository.findAllByMemberWithThumbnail(user).stream()
+		List<MyRoomResponse> myRooms = roomRepository.findAllByMemberWithDetails(user).stream()
 			.map(room -> {
 				Image thumbnailImage = room.getThumbnailImage();
 				String thumbnailUrl =
 					(thumbnailImage != null) ? cloudFrontUtil.getPublicUrl(thumbnailImage.getPermanentFileName()) :
 						null;
-				return MyRoomResponse.from(room, thumbnailUrl);
+				return MyRoomResponse.of(room, thumbnailUrl);
 			})
 			.collect(Collectors.toList());
 
-		List<ReceivedInvitationResponse> receivedInvitations = invitationRepository.findByInviteeAndStatus(user,
-				InvitationStatus.REQUESTED).stream()
+		List<ReceivedInvitationResponse> receivedInvitations = invitationRepository.findByInviteeAndStatusWithRoomAndHost(
+				user, InvitationStatus.REQUESTED).stream()
 			.map(ReceivedInvitationResponse::from)
 			.collect(Collectors.toList());
 
-		List<SentJoinRequestResponse> sentJoinRequests = joinRequestRepository.findByRequesterAndStatus(user,
+		List<SentJoinRequestResponse> sentJoinRequests = joinRequestRepository.findByRequesterAndStatusWithRoom(user,
 				JoinRequestStatus.REQUESTED).stream()
 			.map(SentJoinRequestResponse::from)
 			.collect(Collectors.toList());
