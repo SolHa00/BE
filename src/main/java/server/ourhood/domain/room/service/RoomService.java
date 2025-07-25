@@ -2,20 +2,35 @@ package server.ourhood.domain.room.service;
 
 import static server.ourhood.global.exception.BaseResponseStatus.*;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.image.domain.Image;
 import server.ourhood.domain.image.service.ImageService;
+import server.ourhood.domain.join.domain.JoinRequest;
+import server.ourhood.domain.join.domain.JoinRequestStatus;
+import server.ourhood.domain.join.repository.JoinRequestRepository;
+import server.ourhood.domain.moment.domain.Moment;
+import server.ourhood.domain.moment.repository.MomentRepository;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.domain.RoomMembers;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
 import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
+import server.ourhood.domain.room.dto.response.GetRoomResponse;
+import server.ourhood.domain.room.dto.response.MemberRoomResponse;
+import server.ourhood.domain.room.dto.response.NonMemberRoomResponse;
 import server.ourhood.domain.room.dto.response.RoomCreateResponse;
+import server.ourhood.domain.room.dto.response.RoomDetailResponse;
+import server.ourhood.domain.room.dto.response.RoomMetadataResponse;
+import server.ourhood.domain.room.dto.response.RoomPrivateResponse;
+import server.ourhood.domain.room.dto.response.UserContextResponse;
 import server.ourhood.domain.room.repository.RoomRepository;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
+import server.ourhood.global.util.CloudFrontUtil;
 
 @Service
 @RequiredArgsConstructor
@@ -23,6 +38,9 @@ public class RoomService {
 
 	private final RoomRepository roomRepository;
 	private final ImageService imageService;
+	private final JoinRequestRepository joinRequestRepository;
+	private final MomentRepository momentRepository;
+	private final CloudFrontUtil cloudFrontUtil;
 
 	@Transactional(readOnly = true)
 	public Room findRoomById(Long roomId) {
@@ -92,5 +110,73 @@ public class RoomService {
 			.findFirst()
 			.orElseThrow(() -> new BaseException(USER_NOT_IN_ROOM));
 		room.getRoomMembers().remove(memberToRemove);
+	}
+
+	@Transactional(readOnly = true)
+	public GetRoomResponse getRoomInfo(User user, Long roomId) {
+		boolean isMember = roomRepository.existsByIdAndRoomMembersUser(roomId, user);
+		// 멤버인 경우, 모든 상세 정보 조회
+		if (isMember) {
+			Room room = roomRepository.findByIdWithAllDetails(roomId)
+				.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
+			String thumbnailImageUrl = getThumbnailImageUrl(room);
+			return createMemberRoomResponse(user, room, thumbnailImageUrl);
+		}
+		// 멤버가 아닌 경우, 공개된 정보만 조회
+		Room room = roomRepository.findByIdWithHostAndThumbnail(roomId)
+			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
+		String thumbnailImageUrl = getThumbnailImageUrl(room);
+		return createNonMemberRoomResponse(user, room, thumbnailImageUrl);
+	}
+
+	private MemberRoomResponse createMemberRoomResponse(User user, Room room, String thumbnailImageUrl) {
+		boolean isHost = room.isHost(user);
+		Long numOfNewJoinRequests = joinRequestRepository.countByRoomAndStatus(room, JoinRequestStatus.REQUESTED);
+
+		List<RoomPrivateResponse.UserInfoResponse> members = room.getRoomMembers().stream()
+			.map(RoomMembers::getUser)
+			.map(RoomPrivateResponse.UserInfoResponse::from)
+			.toList();
+
+		List<RoomPrivateResponse.MomentInfoResponse> moments = momentRepository.findAllByRoomWithImage(room).stream()
+			.map(moment -> RoomPrivateResponse.MomentInfoResponse.of(moment, getMomentImageUrl(moment)))
+			.toList();
+
+		RoomPrivateResponse privateResponse = RoomPrivateResponse.of(numOfNewJoinRequests, members, moments);
+
+		return new MemberRoomResponse(
+			new UserContextResponse(true, isHost, null),
+			RoomMetadataResponse.from(room),
+			RoomDetailResponse.of(room, thumbnailImageUrl),
+			privateResponse
+		);
+	}
+
+	private NonMemberRoomResponse createNonMemberRoomResponse(User user, Room room, String thumbnailImageUrl) {
+		Long sentJoinRequestId = joinRequestRepository.findByRoomAndRequester(room, user)
+			.map(JoinRequest::getId)
+			.orElse(null);
+
+		return new NonMemberRoomResponse(
+			new UserContextResponse(false, false, sentJoinRequestId),
+			RoomMetadataResponse.from(room),
+			RoomDetailResponse.of(room, thumbnailImageUrl)
+		);
+	}
+
+	private String getThumbnailImageUrl(Room room) {
+		Image thumbnailImage = room.getThumbnailImage();
+		if (thumbnailImage == null) {
+			return null;
+		}
+		return cloudFrontUtil.getPublicUrl(thumbnailImage.getPermanentFileName());
+	}
+
+	private String getMomentImageUrl(Moment moment) {
+		Image momentImage = moment.getImage();
+		if (momentImage == null) {
+			return null;
+		}
+		return cloudFrontUtil.getPublicUrl(momentImage.getPermanentFileName());
 	}
 }
