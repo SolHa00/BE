@@ -14,7 +14,7 @@ import server.ourhood.domain.invitation.repository.InvitationRepository;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.service.RoomService;
 import server.ourhood.domain.user.domain.User;
-import server.ourhood.domain.user.service.UserService;
+import server.ourhood.domain.user.repository.UserRepository;
 import server.ourhood.global.exception.BaseException;
 
 @Service
@@ -22,25 +22,26 @@ import server.ourhood.global.exception.BaseException;
 public class InvitationService {
 
 	private final InvitationRepository invitationRepository;
-	private final UserService userService;
+	private final UserRepository userRepository;
 	private final RoomService roomService;
 
 	@Transactional(readOnly = true)
-	public Invitation findInvitationById(Long invitationId) {
+	public Invitation getByInvitationId(Long invitationId) {
 		return invitationRepository.findById(invitationId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_INVITATION));
 	}
 
 	@Transactional
 	public InvitationCreateResponse createInvitation(User inviter, InvitationCreateRequest request) {
-		Room room = roomService.findRoomById(request.roomId());
+		Room room = roomService.getByRoomId(request.roomId());
 		room.validateRoomMember(inviter);
-		User invitee = userService.findUserByNickname(request.nickname());
+		User invitee = userRepository.findByNickname(request.nickname())
+			.orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 		validateIfAlreadyRoomMember(room, invitee);
 		validateIfAlreadyRequested(room, invitee);
 		Invitation invitation = Invitation.createInvitation(room, invitee);
 		invitationRepository.save(invitation);
-		return InvitationCreateResponse.of(invitation.getId());
+		return new InvitationCreateResponse(invitation.getId());
 	}
 
 	/**
@@ -63,7 +64,7 @@ public class InvitationService {
 
 	@Transactional
 	public void accept(User invitee, Long invitationId) {
-		Invitation invitation = findInvitationById(invitationId);
+		Invitation invitation = getByInvitationId(invitationId);
 		invitation.validateInvitee(invitee);
 		invitation.accept();
 		Room room = invitation.getRoom();
@@ -73,14 +74,14 @@ public class InvitationService {
 
 	@Transactional
 	public void reject(User invitee, Long invitationId) {
-		Invitation invitation = findInvitationById(invitationId);
+		Invitation invitation = getByInvitationId(invitationId);
 		invitation.validateInvitee(invitee);
 		invitation.reject();
 	}
 
 	@Transactional
 	public void cancel(User inviter, Long invitationId) {
-		Invitation invitation = findInvitationById(invitationId);
+		Invitation invitation = getByInvitationId(invitationId);
 		Room room = invitation.getRoom();
 		room.validateRoomMember(inviter);
 		invitation.cancel();

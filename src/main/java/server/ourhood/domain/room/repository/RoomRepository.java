@@ -21,18 +21,18 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 	List<Room> findAllByMemberWithDetails(@Param("user") User user);
 
 	@Query("SELECT r FROM Room r "
-		+ "LEFT JOIN FETCH r.host "
-		+ "LEFT JOIN FETCH r.thumbnailImage "
-		+ "WHERE r.id = :roomId")
-	Optional<Room> findByIdWithHostAndThumbnail(@Param("roomId") Long roomId);
-
-	@Query("SELECT r FROM Room r "
-		+ "LEFT JOIN FETCH r.host "
-		+ "LEFT JOIN FETCH r.roomMembers rm "
-		+ "LEFT JOIN FETCH rm.user "
+		+ "JOIN FETCH r.host "
+		+ "JOIN FETCH r.roomMembers rm "
+		+ "JOIN FETCH rm.user "
 		+ "LEFT JOIN FETCH r.thumbnailImage "
 		+ "WHERE r.id = :roomId")
 	Optional<Room> findByIdWithAllDetails(@Param("roomId") Long roomId);
+
+	@Query("SELECT r FROM Room r "
+		+ "JOIN FETCH r.host "
+		+ "LEFT JOIN FETCH r.thumbnailImage "
+		+ "WHERE r.id = :roomId")
+	Optional<Room> findByIdWithHostAndThumbnail(@Param("roomId") Long roomId);
 
 	boolean existsByIdAndRoomMembersUser(Long id, User user);
 }

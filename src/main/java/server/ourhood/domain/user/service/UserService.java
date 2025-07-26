@@ -36,14 +36,8 @@ public class UserService {
 	private final CloudFrontUtil cloudFrontUtil;
 
 	@Transactional(readOnly = true)
-	public User findUserById(Long userId) {
+	public User getByUserId(Long userId) {
 		return userRepository.findById(userId)
-			.orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-	}
-
-	@Transactional(readOnly = true)
-	public User findUserByNickname(String nickname) {
-		return userRepository.findByNickname(nickname)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_USER));
 	}
 
@@ -69,12 +63,12 @@ public class UserService {
 			.map(SentJoinRequestResponse::from)
 			.collect(Collectors.toList());
 
-		return UserInfoResponse.of(myRooms, receivedInvitations, sentJoinRequests);
+		return new UserInfoResponse(myRooms, receivedInvitations, sentJoinRequests);
 	}
 
 	@Transactional
 	public void updateUserNickname(Long userId, UserNicknameUpdateRequest request) {
-		User user = findUserById(userId);
+		User user = getByUserId(userId);
 		user.updateNickname(request.nickname());
 	}
 }

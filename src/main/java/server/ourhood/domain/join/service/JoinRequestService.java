@@ -24,19 +24,19 @@ public class JoinRequestService {
 	private final RoomService roomService;
 
 	@Transactional(readOnly = true)
-	public JoinRequest findJoinRequestById(Long joinRequestId) {
+	public JoinRequest getByJoinRequestId(Long joinRequestId) {
 		return joinRequestRepository.findById(joinRequestId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_JOIN_REQUEST));
 	}
 
 	@Transactional
 	public JoinRequestCreateResponse createJoinRequest(User requester, JoinRequestCreateRequest request) {
-		Room room = roomService.findRoomById(request.roomId());
+		Room room = roomService.getByRoomId(request.roomId());
 		validateIfAlreadyRoomMember(room, requester);
 		validateIfAlreadyRequested(room, requester);
 		JoinRequest joinRequest = JoinRequest.createJoinRequest(room, requester);
 		joinRequestRepository.save(joinRequest);
-		return JoinRequestCreateResponse.of(joinRequest.getId());
+		return new JoinRequestCreateResponse(joinRequest.getId());
 	}
 
 	/**
@@ -59,7 +59,7 @@ public class JoinRequestService {
 
 	@Transactional
 	public void accept(User reviewer, Long joinRequestId) {
-		JoinRequest joinRequest = findJoinRequestById(joinRequestId);
+		JoinRequest joinRequest = getByJoinRequestId(joinRequestId);
 		Room room = joinRequest.getRoom();
 		room.validateRoomMember(reviewer);
 		joinRequest.accept();
@@ -68,7 +68,7 @@ public class JoinRequestService {
 
 	@Transactional
 	public void reject(User reviewer, Long joinRequestId) {
-		JoinRequest joinRequest = findJoinRequestById(joinRequestId);
+		JoinRequest joinRequest = getByJoinRequestId(joinRequestId);
 		Room room = joinRequest.getRoom();
 		room.validateRoomMember(reviewer);
 		joinRequest.reject();
@@ -76,7 +76,7 @@ public class JoinRequestService {
 
 	@Transactional
 	public void cancel(User user, Long joinRequestId) {
-		JoinRequest joinRequest = findJoinRequestById(joinRequestId);
+		JoinRequest joinRequest = getByJoinRequestId(joinRequestId);
 		joinRequest.validateRequester(user);
 		joinRequest.cancel();
 	}

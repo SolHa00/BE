@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
 import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
+import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse;
+import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse;
 import server.ourhood.domain.room.dto.response.GetRoomResponse;
 import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.room.service.RoomService;
@@ -56,6 +58,19 @@ public class RoomController {
 	@GetMapping("/{roomId}")
 	public BaseResponse<GetRoomResponse> getRoomInfo(@LoginUser User user, @PathVariable Long roomId) {
 		GetRoomResponse response = roomService.getRoomInfo(user, roomId);
+		return BaseResponse.success(response);
+	}
+
+	@GetMapping("/{roomId}/join-requests")
+	public BaseResponse<GetRoomJoinRequestResponse> getRoomJoinRequests(@LoginUser User user,
+		@PathVariable Long roomId) {
+		GetRoomJoinRequestResponse response = roomService.getRoomJoinRequests(user, roomId);
+		return BaseResponse.success(response);
+	}
+
+	@GetMapping("/{roomId}/invitations")
+	public BaseResponse<GetRoomInvitationResponse> getRoomInvitations(@LoginUser User user, @PathVariable Long roomId) {
+		GetRoomInvitationResponse response = roomService.getRoomInvitations(user, roomId);
 		return BaseResponse.success(response);
 	}
 }

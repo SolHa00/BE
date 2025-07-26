@@ -27,31 +27,31 @@ public class MomentService {
 	private final ImageService imageService;
 
 	@Transactional(readOnly = true)
-	public Moment findMomentById(Long momentId) {
+	public Moment getByMomentId(Long momentId) {
 		return momentRepository.findById(momentId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_MOMENT));
 	}
 
 	@Transactional
 	public MomentCreateResponse createMoment(User user, MomentCreateRequest request) {
-		Room room = roomService.findRoomById(request.roomId());
+		Room room = roomService.getByRoomId(request.roomId());
 		Image image = imageService.findImageByKey(request.momentImageKey());
 		imageService.activateAndMoveImage(image);
 		Moment moment = Moment.createMoment(image, request.momentDescription(), room, user);
 		momentRepository.save(moment);
-		return MomentCreateResponse.of(moment.getId());
+		return new MomentCreateResponse(moment.getId());
 	}
 
 	@Transactional
 	public void updateMoment(User user, Long momentId, MomentUpdateRequest request) {
-		Moment moment = findMomentById(momentId);
+		Moment moment = getByMomentId(momentId);
 		moment.validateOwner(user);
 		moment.updateDescription(request.momentDescription());
 	}
 
 	@Transactional
 	public void deleteMoment(User user, Long momentId) {
-		Moment moment = findMomentById(momentId);
+		Moment moment = getByMomentId(momentId);
 		moment.validateOwner(user);
 		imageService.deleteImage(moment.getImage());
 		momentRepository.delete(moment);

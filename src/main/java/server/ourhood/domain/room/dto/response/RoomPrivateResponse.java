@@ -10,15 +10,6 @@ public record RoomPrivateResponse(
 	List<UserInfoResponse> members,
 	List<MomentInfoResponse> moments
 ) {
-	public static RoomPrivateResponse of(Long numOfNewJoinRequests, List<UserInfoResponse> members,
-		List<MomentInfoResponse> moments) {
-		return new RoomPrivateResponse(
-			numOfNewJoinRequests,
-			members,
-			moments
-		);
-	}
-
 	public record UserInfoResponse(
 		Long userId,
 		String nickname

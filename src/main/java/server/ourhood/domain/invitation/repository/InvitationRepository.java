@@ -19,8 +19,10 @@ public interface InvitationRepository extends JpaRepository<Invitation, Long> {
 	@Query("SELECT i FROM Invitation i "
 		+ "JOIN FETCH i.room r "
 		+ "JOIN FETCH r.host "
-		+ "WHERE i.invitee = :user AND i.status = :status"
-	)
+		+ "WHERE i.invitee = :user AND i.status = :status")
 	List<Invitation> findByInviteeAndStatusWithRoomAndHost(@Param("user") User user,
 		@Param("status") InvitationStatus status);
+
+	@Query("SELECT i FROM Invitation i JOIN FETCH i.invitee WHERE i.room = :room AND i.status = :status")
+	List<Invitation> findByRoomAndStatusWithInvitee(@Param("room") Room room, @Param("status") InvitationStatus status);
 }
