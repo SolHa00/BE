@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.image.domain.Image;
 import server.ourhood.domain.image.service.ImageService;
+import server.ourhood.domain.invitation.domain.InvitationStatus;
+import server.ourhood.domain.invitation.repository.InvitationRepository;
 import server.ourhood.domain.join.domain.JoinRequest;
 import server.ourhood.domain.join.domain.JoinRequestStatus;
 import server.ourhood.domain.join.repository.JoinRequestRepository;
@@ -19,6 +21,10 @@ import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.domain.RoomMembers;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
 import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
+import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse;
+import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse.RoomInvitation;
+import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse;
+import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse.RoomJoinRequest;
 import server.ourhood.domain.room.dto.response.GetRoomResponse;
 import server.ourhood.domain.room.dto.response.MemberRoomResponse;
 import server.ourhood.domain.room.dto.response.NonMemberRoomResponse;
@@ -26,6 +32,8 @@ import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.room.dto.response.RoomDetailResponse;
 import server.ourhood.domain.room.dto.response.RoomMetadataResponse;
 import server.ourhood.domain.room.dto.response.RoomPrivateResponse;
+import server.ourhood.domain.room.dto.response.RoomPrivateResponse.MomentInfoResponse;
+import server.ourhood.domain.room.dto.response.RoomPrivateResponse.UserInfoResponse;
 import server.ourhood.domain.room.dto.response.UserContextResponse;
 import server.ourhood.domain.room.repository.RoomRepository;
 import server.ourhood.domain.user.domain.User;
@@ -41,9 +49,10 @@ public class RoomService {
 	private final JoinRequestRepository joinRequestRepository;
 	private final MomentRepository momentRepository;
 	private final CloudFrontUtil cloudFrontUtil;
+	private final InvitationRepository invitationRepository;
 
 	@Transactional(readOnly = true)
-	public Room findRoomById(Long roomId) {
+	public Room getByRoomId(Long roomId) {
 		return roomRepository.findById(roomId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
 	}
@@ -57,12 +66,12 @@ public class RoomService {
 		Room room = Room.createRoom(request.roomName(), request.roomDescription(), thumbnailImage, user);
 		room.addRoomMember(user);
 		roomRepository.save(room);
-		return RoomCreateResponse.of(room.getId());
+		return new RoomCreateResponse(room.getId());
 	}
 
 	@Transactional
 	public void updateRoom(User user, Long roomId, RoomUpdateRequest request) {
-		Room room = findRoomById(roomId);
+		Room room = getByRoomId(roomId);
 		room.validateRoomHost(user);
 		handleImageUpdate(room, request.isImageRemoved(), request.newThumbnailImageKey());
 		room.updateDetails(request.roomName(), request.roomDescription());
@@ -91,7 +100,7 @@ public class RoomService {
 
 	@Transactional
 	public void deleteRoom(User user, Long roomId) {
-		Room room = findRoomById(roomId);
+		Room room = getByRoomId(roomId);
 		room.validateRoomHost(user);
 		if (room.getThumbnailImage() != null) {
 			imageService.deleteImage(room.getThumbnailImage());
@@ -101,7 +110,7 @@ public class RoomService {
 
 	@Transactional
 	public void leave(User user, Long roomId) {
-		Room room = findRoomById(roomId);
+		Room room = getByRoomId(roomId);
 		if (room.isHost(user)) {
 			throw new BaseException(HOST_CANNOT_LEAVE_ROOM);
 		}
@@ -133,16 +142,16 @@ public class RoomService {
 		boolean isHost = room.isHost(user);
 		Long numOfNewJoinRequests = joinRequestRepository.countByRoomAndStatus(room, JoinRequestStatus.REQUESTED);
 
-		List<RoomPrivateResponse.UserInfoResponse> members = room.getRoomMembers().stream()
+		List<UserInfoResponse> members = room.getRoomMembers().stream()
 			.map(RoomMembers::getUser)
-			.map(RoomPrivateResponse.UserInfoResponse::from)
+			.map(UserInfoResponse::from)
 			.toList();
 
-		List<RoomPrivateResponse.MomentInfoResponse> moments = momentRepository.findAllByRoomWithImage(room).stream()
-			.map(moment -> RoomPrivateResponse.MomentInfoResponse.of(moment, getMomentImageUrl(moment)))
+		List<MomentInfoResponse> moments = momentRepository.findAllByRoomWithImage(room).stream()
+			.map(moment -> MomentInfoResponse.of(moment, getMomentImageUrl(moment)))
 			.toList();
 
-		RoomPrivateResponse privateResponse = RoomPrivateResponse.of(numOfNewJoinRequests, members, moments);
+		RoomPrivateResponse privateResponse = new RoomPrivateResponse(numOfNewJoinRequests, members, moments);
 
 		return new MemberRoomResponse(
 			new UserContextResponse(true, isHost, null),
@@ -178,5 +187,29 @@ public class RoomService {
 			return null;
 		}
 		return cloudFrontUtil.getPublicUrl(momentImage.getPermanentFileName());
+	}
+
+	@Transactional(readOnly = true)
+	public GetRoomJoinRequestResponse getRoomJoinRequests(User user, Long roomId) {
+		Room room = getByRoomId(roomId);
+		room.validateRoomMember(user);
+		List<RoomJoinRequest> joinRequestList = joinRequestRepository.findByRoomAndStatusWithRequester(room,
+				JoinRequestStatus.REQUESTED)
+			.stream()
+			.map(RoomJoinRequest::from)
+			.toList();
+		return new GetRoomJoinRequestResponse(joinRequestList);
+	}
+
+	@Transactional(readOnly = true)
+	public GetRoomInvitationResponse getRoomInvitations(User user, Long roomId) {
+		Room room = getByRoomId(roomId);
+		room.validateRoomMember(user);
+		List<RoomInvitation> invitationList = invitationRepository.findByRoomAndStatusWithInvitee(room,
+				InvitationStatus.REQUESTED)
+			.stream()
+			.map(RoomInvitation::from)
+			.toList();
+		return new GetRoomInvitationResponse(invitationList);
 	}
 }

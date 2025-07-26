@@ -19,12 +19,17 @@ public interface JoinRequestRepository extends JpaRepository<JoinRequest, Long> 
 
 	@Query("SELECT jr FROM JoinRequest jr "
 		+ "JOIN FETCH jr.room r "
-		+ "WHERE jr.requester = :user AND jr.status = :status"
-	)
+		+ "WHERE jr.requester = :user AND jr.status = :status")
 	List<JoinRequest> findByRequesterAndStatusWithRoom(@Param("user") User user,
 		@Param("status") JoinRequestStatus status);
 
 	Optional<JoinRequest> findByRoomAndRequester(Room room, User requester);
 
 	Long countByRoomAndStatus(Room room, JoinRequestStatus status);
+
+	@Query("SELECT j FROM JoinRequest j "
+		+ "JOIN FETCH j.requester "
+		+ "WHERE j.room = :room AND j.status = :status")
+	List<JoinRequest> findByRoomAndStatusWithRequester(@Param("room") Room room,
+		@Param("status") JoinRequestStatus status);
 }
