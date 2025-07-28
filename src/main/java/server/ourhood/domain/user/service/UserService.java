@@ -47,7 +47,7 @@ public class UserService {
 			.map(room -> {
 				Image thumbnailImage = room.getThumbnailImage();
 				String thumbnailUrl =
-					(thumbnailImage != null) ? cloudFrontUtil.getPublicUrl(thumbnailImage.getPermanentFileName()) :
+					(thumbnailImage != null) ? cloudFrontUtil.getImageUrl(thumbnailImage.getPermanentFileName()) :
 						null;
 				return MyRoomResponse.of(room, thumbnailUrl);
 			})
