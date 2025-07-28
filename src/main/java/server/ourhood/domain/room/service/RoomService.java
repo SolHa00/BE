@@ -15,7 +15,6 @@ import server.ourhood.domain.invitation.repository.InvitationRepository;
 import server.ourhood.domain.join.domain.JoinRequest;
 import server.ourhood.domain.join.domain.JoinRequestStatus;
 import server.ourhood.domain.join.repository.JoinRequestRepository;
-import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.domain.moment.repository.MomentRepository;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.domain.RoomMembers;
@@ -128,13 +127,13 @@ public class RoomService {
 		if (isMember) {
 			Room room = roomRepository.findByIdWithAllDetails(roomId)
 				.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
-			String thumbnailImageUrl = getThumbnailImageUrl(room);
+			String thumbnailImageUrl = getImageUrl(room.getThumbnailImage());
 			return createMemberRoomResponse(user, room, thumbnailImageUrl);
 		}
 		// 멤버가 아닌 경우, 공개된 정보만 조회
 		Room room = roomRepository.findByIdWithHostAndThumbnail(roomId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
-		String thumbnailImageUrl = getThumbnailImageUrl(room);
+		String thumbnailImageUrl = getImageUrl(room.getThumbnailImage());
 		return createNonMemberRoomResponse(user, room, thumbnailImageUrl);
 	}
 
@@ -148,7 +147,7 @@ public class RoomService {
 			.toList();
 
 		List<MomentInfoResponse> moments = momentRepository.findAllByRoomWithImage(room).stream()
-			.map(moment -> MomentInfoResponse.of(moment, getMomentImageUrl(moment)))
+			.map(moment -> MomentInfoResponse.of(moment, getImageUrl(moment.getImage())))
 			.toList();
 
 		RoomPrivateResponse privateResponse = new RoomPrivateResponse(numOfNewJoinRequests, members, moments);
@@ -173,20 +172,11 @@ public class RoomService {
 		);
 	}
 
-	private String getThumbnailImageUrl(Room room) {
-		Image thumbnailImage = room.getThumbnailImage();
-		if (thumbnailImage == null) {
+	private String getImageUrl(Image image) {
+		if (image == null) {
 			return null;
 		}
-		return cloudFrontUtil.getPublicUrl(thumbnailImage.getPermanentFileName());
-	}
-
-	private String getMomentImageUrl(Moment moment) {
-		Image momentImage = moment.getImage();
-		if (momentImage == null) {
-			return null;
-		}
-		return cloudFrontUtil.getPublicUrl(momentImage.getPermanentFileName());
+		return cloudFrontUtil.getImageUrl(image.getPermanentFileName());
 	}
 
 	@Transactional(readOnly = true)

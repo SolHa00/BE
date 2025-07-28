@@ -3,6 +3,7 @@ package server.ourhood.domain.invitation.controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -16,30 +17,31 @@ import server.ourhood.global.response.BaseResponse;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/invitations")
 public class InvitationController {
 
 	private final InvitationService invitationService;
 
-	@PostMapping("/api/invitations")
+	@PostMapping
 	public BaseResponse<InvitationCreateResponse> createInvitation(@LoginUser User user,
 		@Valid @RequestBody InvitationCreateRequest request) {
 		InvitationCreateResponse response = invitationService.createInvitation(user, request);
 		return BaseResponse.success(response);
 	}
 
-	@PostMapping("/api/invitations/{invitationId}/accept")
+	@PostMapping("/{invitationId}/accept")
 	public BaseResponse<Void> acceptInvitation(@LoginUser User user, @PathVariable Long invitationId) {
 		invitationService.accept(user, invitationId);
 		return BaseResponse.success();
 	}
 
-	@PostMapping("/api/invitations/{invitationId}/reject")
+	@PostMapping("/{invitationId}/reject")
 	public BaseResponse<Void> rejectInvitation(@LoginUser User user, @PathVariable Long invitationId) {
 		invitationService.reject(user, invitationId);
 		return BaseResponse.success();
 	}
 
-	@PostMapping("/api/invitations/{invitationId}/cancel")
+	@PostMapping("/{invitationId}/cancel")
 	public BaseResponse<Void> cancelInvitation(@LoginUser User user, @PathVariable Long invitationId) {
 		invitationService.cancel(user, invitationId);
 		return BaseResponse.success();

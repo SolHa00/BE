@@ -25,6 +25,8 @@ cookie:
   refresh-token:
     expiry: ${COOKIE_REFRESH_TOKEN_EXPIRY}
     name: "refresh_token"
+  cdn:
+    expiry: ${COOKIE_CDN_EXPIRY}
 
 cloud:
   aws:
@@ -36,7 +38,7 @@ cloud:
     s3:
       bucket: ${S3_BUCKET}
     cloudfront:
-      distribution-domain: ${CLOUDFRONT_DISTRIBUTION_DOMAIN}
       private-key-path: ${CLOUDFRONT_PRIVATE_KEY_PATH}
       key-pair-id: ${CLOUDFRONT_KEY_PAIR_ID}
-      base-url: ${CLOUDFRONT_BASE_URL}
+      custom-domain: ${CLOUDFRONT_CUSTOM_DOMAIN}
+      service-domain: ${CLOUDFRONT_SERVICE_DOMAIN}
