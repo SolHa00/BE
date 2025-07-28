@@ -52,7 +52,7 @@ public class Comment extends BaseTimeEntity {
 	private User owner;
 
 	@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Comment> children = new ArrayList<>();
+	private List<Comment> replyComments = new ArrayList<>();
 
 	@Builder
 	public Comment(String content, Moment moment, Comment parent, User owner) {
