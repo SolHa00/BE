@@ -35,7 +35,6 @@ public class UserService {
 	private final JoinRequestRepository joinRequestRepository;
 	private final CloudFrontUtil cloudFrontUtil;
 
-	@Transactional(readOnly = true)
 	public User getByUserId(Long userId) {
 		return userRepository.findById(userId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_USER));

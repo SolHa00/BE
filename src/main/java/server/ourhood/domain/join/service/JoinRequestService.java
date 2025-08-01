@@ -23,7 +23,6 @@ public class JoinRequestService {
 	private final JoinRequestRepository joinRequestRepository;
 	private final RoomService roomService;
 
-	@Transactional(readOnly = true)
 	public JoinRequest getByJoinRequestId(Long joinRequestId) {
 		return joinRequestRepository.findById(joinRequestId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_JOIN_REQUEST));
