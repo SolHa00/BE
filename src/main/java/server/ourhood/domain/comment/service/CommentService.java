@@ -2,8 +2,6 @@ package server.ourhood.domain.comment.service;
 
 import static server.ourhood.global.exception.BaseResponseStatus.*;
 
-import java.util.Optional;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +23,6 @@ public class CommentService {
 	private final CommentRepository commentRepository;
 	private final MomentService momentService;
 
-	@Transactional(readOnly = true)
 	public Comment getByCommentId(Long commentId) {
 		return commentRepository.findById(commentId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_COMMENT));
@@ -34,18 +31,15 @@ public class CommentService {
 	@Transactional
 	public CommentCreateResponse createComment(User user, CommentCreateRequest request) {
 		Moment moment = momentService.getByMomentId(request.momentId());
-		Comment parent = Optional.ofNullable(request.parentId())
-			.map(this::getByCommentId)
-			.map(p -> {
-				if (p.isReply()) {
-					throw new BaseException(INVALID_COMMENT_LEVEL);
-				}
-				return p;
-			})
-			.orElse(null);
-		Comment comment = Comment.createComment(request.commentContent(), moment, parent, user);
-		commentRepository.save(comment);
-		return new CommentCreateResponse(comment.getId());
+		Comment comment = createAndSaveComment(user, moment, request);
+		return CommentCreateResponse.from(comment);
+	}
+
+	private Comment createAndSaveComment(User user, Moment moment, CommentCreateRequest request) {
+		Comment comment = request.parentId() != null
+			? Comment.createComment(request.commentContent(), moment, getByCommentId(request.parentId()), user)
+			: Comment.createComment(request.commentContent(), moment, null, user);
+		return commentRepository.save(comment);
 	}
 
 	@Transactional

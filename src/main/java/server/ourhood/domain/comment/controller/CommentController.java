@@ -34,7 +34,7 @@ public class CommentController {
 
 	@PutMapping("/{commentId}")
 	public BaseResponse<Void> updateComment(@LoginUser User user, @PathVariable Long commentId,
-		@RequestBody CommentUpdateRequest request) {
+		@Valid @RequestBody CommentUpdateRequest request) {
 		commentService.updateComment(user, commentId, request);
 		return BaseResponse.success();
 	}
