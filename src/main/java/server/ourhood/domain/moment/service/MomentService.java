@@ -40,7 +40,6 @@ public class MomentService {
 	private final CommentRepository commentRepository;
 	private static final Long ROOT_COMMENT_PARENT_ID = -1L;
 
-	@Transactional(readOnly = true)
 	public Moment getByMomentId(Long momentId) {
 		return momentRepository.findById(momentId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_MOMENT));
@@ -93,8 +92,7 @@ public class MomentService {
 	/**
 	 * 전체 댓글 리스트를 부모 댓글 ID를 기준으로 그룹핑
 	 */
-	private Map<Long, List<Comment>>
-	groupCommentsByParentId(List<Comment> allComments) {
+	private Map<Long, List<Comment>> groupCommentsByParentId(List<Comment> allComments) {
 		return allComments.stream()
 			.collect(
 				Collectors.groupingBy(
@@ -103,7 +101,8 @@ public class MomentService {
 						return (parent != null)
 							? parent.getId()
 							: ROOT_COMMENT_PARENT_ID;
-					}));
+					})
+			);
 	}
 
 	/**

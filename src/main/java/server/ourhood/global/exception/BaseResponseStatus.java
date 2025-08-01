@@ -21,6 +21,7 @@ public enum BaseResponseStatus {
 	KAKAO_INVALID_AUTH_CODE(40001, HttpStatus.BAD_REQUEST, "카카오 인증 코드가 유효하지 않습니다."),
 	INVALID_IMAGE_FILE_EXTENSION(40002, HttpStatus.BAD_REQUEST, "올바른 이미지 확장자가 아닙니다."),
 	HOST_CANNOT_LEAVE_ROOM(40003, HttpStatus.BAD_REQUEST, "방장은 방을 나갈 수 없습니다."),
+	INVALID_COMMENT_LEVEL(40004, HttpStatus.BAD_REQUEST, "대댓글에는 댓글을 달 수 없습니다."),
 
 	/**
 	 * 401 UNAUTHORIZED 권한없음(인증 실패)
@@ -68,12 +69,6 @@ public enum BaseResponseStatus {
 	ALREADY_PROCESSED_INVITATION(40903, HttpStatus.CONFLICT, "이미 처리된 초대 요청입니다."),
 	ALREADY_PROCESSED_JOIN_REQUEST(40904, HttpStatus.CONFLICT, "이미 처리된 참여 요청입니다."),
 	ALREADY_MEMBER_IN_ROOM(40905, HttpStatus.CONFLICT, "이미 해당 방에 속해있는 사용자입니다."),
-
-	/**
-	 * 422 UNPROCESSABLE_ENTITY
-	 */
-	UNPROCESSABLE_ENTITY(422, HttpStatus.UNPROCESSABLE_ENTITY, "UNPROCESSABLE_ENTITY"),
-	INVALID_COMMENT_LEVEL(42201, HttpStatus.UNPROCESSABLE_ENTITY, "대댓글에는 댓글을 달 수 없습니다."),
 
 	/**
 	 * 5XX Error

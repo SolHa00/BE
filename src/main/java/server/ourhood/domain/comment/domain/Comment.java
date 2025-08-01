@@ -63,6 +63,9 @@ public class Comment extends BaseTimeEntity {
 	}
 
 	public static Comment createComment(String content, Moment moment, Comment parent, User owner) {
+		if (parent != null && parent.isReply()) {
+			throw new BaseException(INVALID_COMMENT_LEVEL);
+		}
 		return Comment.builder()
 			.content(content)
 			.moment(moment)
@@ -71,12 +74,12 @@ public class Comment extends BaseTimeEntity {
 			.build();
 	}
 
-	public void updateContent(String content) {
-		this.content = content;
-	}
-
 	public boolean isReply() {
 		return this.parent != null;
+	}
+
+	public void updateContent(String content) {
+		this.content = content;
 	}
 
 	public void validateOwner(User user) {

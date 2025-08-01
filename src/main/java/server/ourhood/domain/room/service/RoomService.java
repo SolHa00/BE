@@ -50,7 +50,6 @@ public class RoomService {
 	private final CloudFrontUtil cloudFrontUtil;
 	private final InvitationRepository invitationRepository;
 
-	@Transactional(readOnly = true)
 	public Room getByRoomId(Long roomId) {
 		return roomRepository.findById(roomId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));

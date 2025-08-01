@@ -25,7 +25,6 @@ public class InvitationService {
 	private final UserRepository userRepository;
 	private final RoomService roomService;
 
-	@Transactional(readOnly = true)
 	public Invitation getByInvitationId(Long invitationId) {
 		return invitationRepository.findById(invitationId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_INVITATION));
