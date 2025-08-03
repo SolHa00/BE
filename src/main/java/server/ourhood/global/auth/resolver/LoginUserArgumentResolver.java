@@ -9,10 +9,10 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import server.ourhood.domain.auth.controller.HeaderHandler;
-import server.ourhood.domain.auth.service.TokenProvider;
+import server.ourhood.domain.auth.api.HeaderHandler;
+import server.ourhood.domain.auth.application.TokenProvider;
+import server.ourhood.domain.user.dao.UserRepository;
 import server.ourhood.domain.user.domain.User;
-import server.ourhood.domain.user.repository.UserRepository;
 import server.ourhood.global.auth.annotation.LoginUser;
 
 @Component
