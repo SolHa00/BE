@@ -29,7 +29,7 @@ public class MomentRepositoryImpl implements MomentRepositoryCustom {
 	}
 
 	@Override
-	public Optional<Moment> findByIdWithDetails(Long momentId) {
+	public Optional<Moment> findByIdWithOwnerAndImage(Long momentId) {
 		return Optional.ofNullable(
 			queryFactory
 				.selectFrom(moment)

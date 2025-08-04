@@ -42,7 +42,7 @@ public class UserService {
 	public UserInfoResponse getUserInfo(User user) {
 		MyInfo myInfo = MyInfo.from(user);
 
-		List<MyRooms> myRooms = roomRepository.findAllByMemberWithDetails(user).stream()
+		List<MyRooms> myRooms = roomRepository.findAllByMemberWithHostAndThumbnailAndMembers(user).stream()
 			.map(room -> {
 				Image thumbnailImage = room.getThumbnailImage();
 				String thumbnailUrl =
