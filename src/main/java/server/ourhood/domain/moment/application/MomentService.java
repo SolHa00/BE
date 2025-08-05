@@ -73,7 +73,7 @@ public class MomentService {
 
 	@Transactional(readOnly = true)
 	public GetMomentResponse getMoment(User user, Long momentId) {
-		Moment moment = momentRepository.findByIdWithDetails(momentId)
+		Moment moment = momentRepository.findByIdWithOwnerAndImage(momentId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_MOMENT));
 		moment.getRoom().validateRoomMember(user);
 		List<Comment> allComments = commentRepository.findAllCommentsByMomentId(momentId);

@@ -31,19 +31,17 @@ public class AuthController {
 	private final CookieUtil cookieUtil;
 
 	@GetMapping("/{oauthType}")
-	public BaseResponse<OAuthUrlResponse> redirectAuthRequestUrl(@PathVariable String oauthType) {
-		OAuthType oauthProvider = OAuthType.fromName(oauthType);
-		OAuthUrlResponse response = authService.getAuthCodeRequestUrl(oauthProvider);
+	public BaseResponse<OAuthUrlResponse> redirectAuthRequestUrl(@PathVariable OAuthType oauthType) {
+		OAuthUrlResponse response = authService.getAuthCodeRequestUrl(oauthType);
 		return BaseResponse.success(response);
 	}
 
 	@PostMapping("/login/{oauthType}")
 	public BaseResponse<AuthResponse> login(
-		@PathVariable String oauthType,
+		@PathVariable OAuthType oauthType,
 		@RequestParam String code,
 		HttpServletResponse servletResponse) {
-		OAuthType oauthProvider = OAuthType.fromName(oauthType);
-		AuthServiceResponse serviceResponse = authService.loginAndGenerateToken(oauthProvider, code);
+		AuthServiceResponse serviceResponse = authService.loginAndGenerateToken(oauthType, code);
 		AuthResponse response = serviceResponse.clientResponse();
 		cookieUtil.addCookie(servletResponse, serviceResponse.refreshToken());
 		return BaseResponse.success(response);

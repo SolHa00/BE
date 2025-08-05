@@ -1,9 +1,11 @@
 package server.ourhood.domain.room.application;
 
+import static server.ourhood.domain.room.dto.response.GetRoomListResponse.RoomList.*;
 import static server.ourhood.global.exception.BaseResponseStatus.*;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,11 +22,14 @@ import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.domain.RoomMembers;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
+import server.ourhood.domain.room.dto.request.RoomSearchCondition;
 import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse.RoomInvitation;
 import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse;
 import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse.RoomJoinRequest;
+import server.ourhood.domain.room.dto.response.GetRoomListResponse;
+import server.ourhood.domain.room.dto.response.GetRoomListResponse.RoomList;
 import server.ourhood.domain.room.dto.response.GetRoomResponse;
 import server.ourhood.domain.room.dto.response.MemberRoomResponse;
 import server.ourhood.domain.room.dto.response.NonMemberRoomResponse;
@@ -124,7 +129,7 @@ public class RoomService {
 		boolean isMember = roomRepository.existsByIdAndRoomMembersUser(roomId, user);
 		// 멤버인 경우, 모든 상세 정보 조회
 		if (isMember) {
-			Room room = roomRepository.findByIdWithAllDetails(roomId)
+			Room room = roomRepository.findByIdWithHostAndThumbnailAndMembersWithUser(roomId)
 				.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
 			String thumbnailImageUrl = getImageUrl(room.getThumbnailImage());
 			return createMemberRoomResponse(user, room, thumbnailImageUrl);
@@ -200,5 +205,25 @@ public class RoomService {
 			.map(RoomInvitation::from)
 			.toList();
 		return new GetRoomInvitationResponse(invitationList);
+	}
+
+	@Transactional(readOnly = true)
+	public GetRoomListResponse getRooms(RoomSearchCondition condition, String keyword, Sort sort) {
+		List<Room> rooms = roomRepository.searchRooms(condition, keyword, sort);
+		List<RoomList> roomList = rooms.stream()
+			.map(room -> {
+				String thumbnailUrl = getImageUrl(room.getThumbnailImage());
+				RoomMetadata metadata = new RoomMetadata(
+					room.getId(),
+					room.getHost().getNickname(),
+					room.getCreatedAt(),
+					room.getRoomMembers().size());
+				RoomDetail detail = new RoomDetail(
+					room.getName(),
+					thumbnailUrl);
+				return new RoomList(metadata, detail);
+			})
+			.toList();
+		return new GetRoomListResponse(roomList);
 	}
 }

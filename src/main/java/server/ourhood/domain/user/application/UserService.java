@@ -1,5 +1,6 @@
 package server.ourhood.domain.user.application;
 
+import static server.ourhood.domain.user.dto.response.UserInfoResponse.*;
 import static server.ourhood.global.exception.BaseResponseStatus.*;
 
 import java.util.List;
@@ -17,10 +18,7 @@ import server.ourhood.domain.join.domain.JoinRequestStatus;
 import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.user.dao.UserRepository;
 import server.ourhood.domain.user.domain.User;
-import server.ourhood.domain.user.dto.request.UserNicknameUpdateRequest;
-import server.ourhood.domain.user.dto.response.MyRoomResponse;
-import server.ourhood.domain.user.dto.response.ReceivedInvitationResponse;
-import server.ourhood.domain.user.dto.response.SentJoinRequestResponse;
+import server.ourhood.domain.user.dto.request.UserInfoUpdateRequest;
 import server.ourhood.domain.user.dto.response.UserInfoResponse;
 import server.ourhood.global.exception.BaseException;
 import server.ourhood.global.util.CloudFrontUtil;
@@ -42,31 +40,33 @@ public class UserService {
 
 	@Transactional(readOnly = true)
 	public UserInfoResponse getUserInfo(User user) {
-		List<MyRoomResponse> myRooms = roomRepository.findAllByMemberWithDetails(user).stream()
+		MyInfo myInfo = MyInfo.from(user);
+
+		List<MyRooms> myRooms = roomRepository.findAllByMemberWithHostAndThumbnailAndMembers(user).stream()
 			.map(room -> {
 				Image thumbnailImage = room.getThumbnailImage();
 				String thumbnailUrl =
 					(thumbnailImage != null) ? cloudFrontUtil.getImageUrl(thumbnailImage.getPermanentFileName()) :
 						null;
-				return MyRoomResponse.of(room, thumbnailUrl);
+				return MyRooms.of(room, thumbnailUrl);
 			})
 			.collect(Collectors.toList());
 
-		List<ReceivedInvitationResponse> receivedInvitations = invitationRepository.findByInviteeAndStatusWithRoomAndHost(
+		List<ReceivedInvitations> receivedInvitations = invitationRepository.findByInviteeAndStatusWithRoomAndHost(
 				user, InvitationStatus.REQUESTED).stream()
-			.map(ReceivedInvitationResponse::from)
+			.map(ReceivedInvitations::from)
 			.collect(Collectors.toList());
 
-		List<SentJoinRequestResponse> sentJoinRequests = joinRequestRepository.findByRequesterAndStatusWithRoom(user,
+		List<SentJoinRequests> sentJoinRequests = joinRequestRepository.findByRequesterAndStatusWithRoom(user,
 				JoinRequestStatus.REQUESTED).stream()
-			.map(SentJoinRequestResponse::from)
+			.map(SentJoinRequests::from)
 			.collect(Collectors.toList());
 
-		return new UserInfoResponse(myRooms, receivedInvitations, sentJoinRequests);
+		return new UserInfoResponse(myInfo, myRooms, receivedInvitations, sentJoinRequests);
 	}
 
 	@Transactional
-	public void updateUserNickname(Long userId, UserNicknameUpdateRequest request) {
+	public void updateUserInfo(Long userId, UserInfoUpdateRequest request) {
 		User user = getByUserId(userId);
 		user.updateNickname(request.nickname());
 	}

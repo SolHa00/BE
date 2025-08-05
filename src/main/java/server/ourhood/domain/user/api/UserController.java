@@ -10,7 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.user.application.UserService;
 import server.ourhood.domain.user.domain.User;
-import server.ourhood.domain.user.dto.request.UserNicknameUpdateRequest;
+import server.ourhood.domain.user.dto.request.UserInfoUpdateRequest;
 import server.ourhood.domain.user.dto.response.UserInfoResponse;
 import server.ourhood.global.auth.annotation.LoginUser;
 import server.ourhood.global.response.BaseResponse;
@@ -28,10 +28,10 @@ public class UserController {
 		return BaseResponse.success(response);
 	}
 
-	@PutMapping("/nickname")
-	public BaseResponse<Void> updateUserNickname(@LoginUser User user,
-		@Valid @RequestBody UserNicknameUpdateRequest request) {
-		userService.updateUserNickname(user.getId(), request);
+	@PutMapping("/me")
+	public BaseResponse<Void> updateUserInfo(@LoginUser User user,
+		@Valid @RequestBody UserInfoUpdateRequest request) {
+		userService.updateUserInfo(user.getId(), request);
 		return BaseResponse.success();
 	}
 }

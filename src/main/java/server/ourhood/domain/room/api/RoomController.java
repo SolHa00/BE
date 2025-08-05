@@ -2,6 +2,8 @@ package server.ourhood.domain.room.api;
 
 import java.util.List;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.SortDefault;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -9,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.Cookie;
@@ -17,9 +20,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.room.application.RoomService;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
+import server.ourhood.domain.room.dto.request.RoomSearchCondition;
 import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse;
 import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse;
+import server.ourhood.domain.room.dto.response.GetRoomListResponse;
 import server.ourhood.domain.room.dto.response.GetRoomResponse;
 import server.ourhood.domain.room.dto.response.MemberRoomResponse;
 import server.ourhood.domain.room.dto.response.RoomCreateResponse;
@@ -85,6 +90,15 @@ public class RoomController {
 	@GetMapping("/{roomId}/invitations")
 	public BaseResponse<GetRoomInvitationResponse> getRoomInvitations(@LoginUser User user, @PathVariable Long roomId) {
 		GetRoomInvitationResponse response = roomService.getRoomInvitations(user, roomId);
+		return BaseResponse.success(response);
+	}
+
+	@GetMapping
+	public BaseResponse<GetRoomListResponse> getRooms(
+		@RequestParam(required = false) RoomSearchCondition condition,
+		@RequestParam(required = false) String q,
+		@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC) Sort sort) {
+		GetRoomListResponse response = roomService.getRooms(condition, q, sort);
 		return BaseResponse.success(response);
 	}
 }
