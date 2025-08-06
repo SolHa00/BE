@@ -1,6 +1,7 @@
 package server.ourhood.domain.room.application;
 
 import static server.ourhood.domain.room.dto.response.GetRoomListResponse.RoomList.*;
+import static server.ourhood.domain.room.dto.response.GetRoomMomentsResponse.*;
 import static server.ourhood.global.exception.BaseResponseStatus.*;
 
 import java.util.List;
@@ -18,27 +19,28 @@ import server.ourhood.domain.join.dao.JoinRequestRepository;
 import server.ourhood.domain.join.domain.JoinRequest;
 import server.ourhood.domain.join.domain.JoinRequestStatus;
 import server.ourhood.domain.moment.dao.MomentRepository;
+import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.domain.RoomMembers;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
 import server.ourhood.domain.room.dto.request.RoomSearchCondition;
 import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
+import server.ourhood.domain.room.dto.response.GetRoomDetailResponse;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse.RoomInvitation;
 import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse;
 import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse.RoomJoinRequest;
 import server.ourhood.domain.room.dto.response.GetRoomListResponse;
 import server.ourhood.domain.room.dto.response.GetRoomListResponse.RoomList;
-import server.ourhood.domain.room.dto.response.GetRoomResponse;
-import server.ourhood.domain.room.dto.response.MemberRoomResponse;
-import server.ourhood.domain.room.dto.response.NonMemberRoomResponse;
+import server.ourhood.domain.room.dto.response.GetRoomMembersResponse;
+import server.ourhood.domain.room.dto.response.GetRoomMembersResponse.MemberInfo;
+import server.ourhood.domain.room.dto.response.GetRoomMomentsResponse;
+import server.ourhood.domain.room.dto.response.MemberRoomDetailResponse;
+import server.ourhood.domain.room.dto.response.NonMemberRoomDetailResponse;
 import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.room.dto.response.RoomDetailResponse;
 import server.ourhood.domain.room.dto.response.RoomMetadataResponse;
-import server.ourhood.domain.room.dto.response.RoomPrivateResponse;
-import server.ourhood.domain.room.dto.response.RoomPrivateResponse.MomentInfoResponse;
-import server.ourhood.domain.room.dto.response.RoomPrivateResponse.UserInfoResponse;
 import server.ourhood.domain.room.dto.response.UserContextResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
@@ -51,9 +53,9 @@ public class RoomService {
 	private final RoomRepository roomRepository;
 	private final ImageService imageService;
 	private final JoinRequestRepository joinRequestRepository;
-	private final MomentRepository momentRepository;
 	private final CloudFrontUtil cloudFrontUtil;
 	private final InvitationRepository invitationRepository;
+	private final MomentRepository momentRepository;
 
 	public Room getByRoomId(Long roomId) {
 		return roomRepository.findById(roomId)
@@ -74,11 +76,18 @@ public class RoomService {
 
 	@Transactional
 	public void updateRoom(User user, Long roomId, RoomUpdateRequest request) {
-		Room room = getByRoomId(roomId);
-		room.validateRoomHost(user);
+		Room room = roomRepository.findByIdWithHost(roomId)
+			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
+		validateRoomHost(user, room);
 		handleImageUpdate(room, request.isImageRemoved(), request.newThumbnailImageKey());
 		room.updateDetails(request.roomName(), request.roomDescription());
 		roomRepository.save(room);
+	}
+
+	private void validateRoomHost(User user, Room room) {
+		if (!room.getHost().equals(user)) {
+			throw new BaseException(NOT_ROOM_HOST);
+		}
 	}
 
 	private void handleImageUpdate(Room room, Boolean imageRemoved, String newThumbnailImageKey) {
@@ -103,8 +112,9 @@ public class RoomService {
 
 	@Transactional
 	public void deleteRoom(User user, Long roomId) {
-		Room room = getByRoomId(roomId);
-		room.validateRoomHost(user);
+		Room room = roomRepository.findByIdWithHost(roomId)
+			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
+		validateRoomHost(user, room);
 		if (room.getThumbnailImage() != null) {
 			imageService.deleteImage(room.getThumbnailImage());
 		}
@@ -113,8 +123,9 @@ public class RoomService {
 
 	@Transactional
 	public void leave(User user, Long roomId) {
-		Room room = getByRoomId(roomId);
-		if (room.isHost(user)) {
+		Room room = roomRepository.findByIdWithHost(roomId)
+			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
+		if (room.getHost().equals(user)) {
 			throw new BaseException(HOST_CANNOT_LEAVE_ROOM);
 		}
 		RoomMembers memberToRemove = room.getRoomMembers().stream()
@@ -125,51 +136,35 @@ public class RoomService {
 	}
 
 	@Transactional(readOnly = true)
-	public GetRoomResponse getRoomInfo(User user, Long roomId) {
+	public GetRoomDetailResponse getRoomDetail(User user, Long roomId) {
 		boolean isMember = roomRepository.existsByIdAndRoomMembersUser(roomId, user);
-		// 멤버인 경우, 모든 상세 정보 조회
-		if (isMember) {
-			Room room = roomRepository.findByIdWithHostAndThumbnailAndMembersWithUser(roomId)
-				.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
-			String thumbnailImageUrl = getImageUrl(room.getThumbnailImage());
-			return createMemberRoomResponse(user, room, thumbnailImageUrl);
-		}
-		// 멤버가 아닌 경우, 공개된 정보만 조회
 		Room room = roomRepository.findByIdWithHostAndThumbnail(roomId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
 		String thumbnailImageUrl = getImageUrl(room.getThumbnailImage());
+		// 멤버인 경우
+		if (isMember) {
+			return createMemberRoomResponse(user, room, thumbnailImageUrl);
+		}
+		// 멤버가 아닌 경우
 		return createNonMemberRoomResponse(user, room, thumbnailImageUrl);
 	}
 
-	private MemberRoomResponse createMemberRoomResponse(User user, Room room, String thumbnailImageUrl) {
-		boolean isHost = room.isHost(user);
+	private MemberRoomDetailResponse createMemberRoomResponse(User user, Room room, String thumbnailImageUrl) {
+		boolean isHost = room.getHost().equals(user);
 		Long numOfNewJoinRequests = joinRequestRepository.countByRoomAndStatus(room, JoinRequestStatus.REQUESTED);
-
-		List<UserInfoResponse> members = room.getRoomMembers().stream()
-			.map(RoomMembers::getUser)
-			.map(UserInfoResponse::from)
-			.toList();
-
-		List<MomentInfoResponse> moments = momentRepository.findAllByRoomWithImage(room).stream()
-			.map(moment -> MomentInfoResponse.of(moment, getImageUrl(moment.getImage())))
-			.toList();
-
-		RoomPrivateResponse privateResponse = new RoomPrivateResponse(numOfNewJoinRequests, members, moments);
-
-		return new MemberRoomResponse(
+		return new MemberRoomDetailResponse(
 			new UserContextResponse(true, isHost, null),
 			RoomMetadataResponse.from(room),
 			RoomDetailResponse.of(room, thumbnailImageUrl),
-			privateResponse
+			numOfNewJoinRequests
 		);
 	}
 
-	private NonMemberRoomResponse createNonMemberRoomResponse(User user, Room room, String thumbnailImageUrl) {
+	private NonMemberRoomDetailResponse createNonMemberRoomResponse(User user, Room room, String thumbnailImageUrl) {
 		Long sentJoinRequestId = joinRequestRepository.findByRoomAndRequester(room, user)
 			.map(JoinRequest::getId)
 			.orElse(null);
-
-		return new NonMemberRoomResponse(
+		return new NonMemberRoomDetailResponse(
 			new UserContextResponse(false, false, sentJoinRequestId),
 			RoomMetadataResponse.from(room),
 			RoomDetailResponse.of(room, thumbnailImageUrl)
@@ -184,10 +179,44 @@ public class RoomService {
 	}
 
 	@Transactional(readOnly = true)
-	public GetRoomJoinRequestResponse getRoomJoinRequests(User user, Long roomId) {
+	public GetRoomMembersResponse getRoomMembersInfo(User user, Long roomId) {
+		validateRoomMember(roomId, user);
+		Room room = roomRepository.findByIdWithRoomMembersAndUser(roomId)
+			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
+		List<MemberInfo> memberInfoList = room.getRoomMembers().stream()
+			.map(roomMembers -> {
+				User member = roomMembers.getUser();
+				return MemberInfo.from(member);
+			})
+			.toList();
+		return new GetRoomMembersResponse(memberInfoList);
+	}
+
+	private void validateRoomMember(Long roomId, User user) {
+		if (!roomRepository.existsByIdAndRoomMembersUser(roomId, user)) {
+			throw new BaseException(NOT_ROOM_MEMBER);
+		}
+	}
+
+	@Transactional(readOnly = true)
+	public GetRoomMomentsResponse getRoomMomentsInfo(User user, Long roomId) {
+		validateRoomMember(roomId, user);
 		Room room = getByRoomId(roomId);
-		room.validateRoomMember(user);
-		List<RoomJoinRequest> joinRequestList = joinRequestRepository.findByRoomAndStatusWithRequester(room,
+		List<Moment> moments = momentRepository.findAllByRoomWithImageOrderByCreatedAtDesc(room);
+		List<MomentInfo> momentInfoList = moments.stream()
+			.map(moment -> {
+				String momentImageUrl = getImageUrl(moment.getImage());
+				return MomentInfo.of(moment, momentImageUrl);
+			})
+			.toList();
+		return new GetRoomMomentsResponse(momentInfoList);
+	}
+
+	@Transactional(readOnly = true)
+	public GetRoomJoinRequestResponse getRoomJoinRequests(User user, Long roomId) {
+		validateRoomMember(roomId, user);
+		Room room = getByRoomId(roomId);
+		List<RoomJoinRequest> joinRequestList = joinRequestRepository.findAllByRoomAndStatusWithRequester(room,
 				JoinRequestStatus.REQUESTED)
 			.stream()
 			.map(RoomJoinRequest::from)
@@ -197,9 +226,9 @@ public class RoomService {
 
 	@Transactional(readOnly = true)
 	public GetRoomInvitationResponse getRoomInvitations(User user, Long roomId) {
+		validateRoomMember(roomId, user);
 		Room room = getByRoomId(roomId);
-		room.validateRoomMember(user);
-		List<RoomInvitation> invitationList = invitationRepository.findByRoomAndStatusWithInvitee(room,
+		List<RoomInvitation> invitationList = invitationRepository.findAllByRoomAndStatusWithInvitee(room,
 				InvitationStatus.REQUESTED)
 			.stream()
 			.map(RoomInvitation::from)
@@ -213,14 +242,8 @@ public class RoomService {
 		List<RoomList> roomList = rooms.stream()
 			.map(room -> {
 				String thumbnailUrl = getImageUrl(room.getThumbnailImage());
-				RoomMetadata metadata = new RoomMetadata(
-					room.getId(),
-					room.getHost().getNickname(),
-					room.getCreatedAt(),
-					room.getRoomMembers().size());
-				RoomDetail detail = new RoomDetail(
-					room.getName(),
-					thumbnailUrl);
+				RoomMetadata metadata = RoomMetadata.from(room);
+				RoomDetail detail = RoomDetail.of(room, thumbnailUrl);
 				return new RoomList(metadata, detail);
 			})
 			.toList();

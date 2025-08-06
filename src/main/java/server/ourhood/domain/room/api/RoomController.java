@@ -22,11 +22,13 @@ import server.ourhood.domain.room.application.RoomService;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
 import server.ourhood.domain.room.dto.request.RoomSearchCondition;
 import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
+import server.ourhood.domain.room.dto.response.GetRoomDetailResponse;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse;
 import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse;
 import server.ourhood.domain.room.dto.response.GetRoomListResponse;
-import server.ourhood.domain.room.dto.response.GetRoomResponse;
-import server.ourhood.domain.room.dto.response.MemberRoomResponse;
+import server.ourhood.domain.room.dto.response.GetRoomMembersResponse;
+import server.ourhood.domain.room.dto.response.GetRoomMomentsResponse;
+import server.ourhood.domain.room.dto.response.MemberRoomDetailResponse;
 import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.auth.annotation.LoginUser;
@@ -68,15 +70,27 @@ public class RoomController {
 	}
 
 	@GetMapping("/{roomId}")
-	public BaseResponse<GetRoomResponse> getRoomInfo(@LoginUser User user, @PathVariable Long roomId,
+	public BaseResponse<GetRoomDetailResponse> getRoomDetail(@LoginUser User user, @PathVariable Long roomId,
 		HttpServletResponse httpResponse) {
-		GetRoomResponse response = roomService.getRoomInfo(user, roomId);
-		if (response instanceof MemberRoomResponse) {
+		GetRoomDetailResponse response = roomService.getRoomDetail(user, roomId);
+		if (response instanceof MemberRoomDetailResponse) {
 			List<Cookie> signedCookies = cloudFrontUtil.generateSignedCookies();
 			for (Cookie cookie : signedCookies) {
 				httpResponse.addCookie(cookie);
 			}
 		}
+		return BaseResponse.success(response);
+	}
+
+	@GetMapping("/{roomId}/members")
+	public BaseResponse<GetRoomMembersResponse> getRoomMembersInfo(@LoginUser User user, @PathVariable Long roomId) {
+		GetRoomMembersResponse response = roomService.getRoomMembersInfo(user, roomId);
+		return BaseResponse.success(response);
+	}
+
+	@GetMapping("/{roomId}/moments")
+	public BaseResponse<GetRoomMomentsResponse> getRoomMomentsInfo(@LoginUser User user, @PathVariable Long roomId) {
+		GetRoomMomentsResponse response = roomService.getRoomMomentsInfo(user, roomId);
 		return BaseResponse.success(response);
 	}
 

@@ -12,9 +12,11 @@ import server.ourhood.domain.user.domain.User;
 public interface RoomRepositoryCustom {
 	List<Room> findAllByMemberWithHostAndThumbnailAndMembers(User user);
 
-	Optional<Room> findByIdWithHostAndThumbnailAndMembersWithUser(Long roomId);
+	Optional<Room> findByIdWithHost(Long roomId);
 
 	Optional<Room> findByIdWithHostAndThumbnail(Long roomId);
+
+	Optional<Room> findByIdWithRoomMembersAndUser(Long roomId);
 
 	List<Room> searchRooms(RoomSearchCondition condition, String keyword, Sort sort);
 }

@@ -1,8 +1,8 @@
 package server.ourhood.domain.room.dto.response;
 
-public record NonMemberRoomResponse(
+public record NonMemberRoomDetailResponse(
 	UserContextResponse userContext,
 	RoomMetadataResponse roomMetadata,
 	RoomDetailResponse roomDetail
-) implements GetRoomResponse {
+) implements GetRoomDetailResponse {
 }
