@@ -22,7 +22,7 @@ public class JoinRequestRepositoryImpl implements JoinRequestRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<JoinRequest> findByRequesterAndStatusWithRoom(User user, JoinRequestStatus status) {
+	public List<JoinRequest> findAllByRequesterAndStatusWithRoom(User user, JoinRequestStatus status) {
 		return queryFactory
 			.selectFrom(joinRequest)
 			.join(joinRequest.room).fetchJoin()
@@ -31,7 +31,7 @@ public class JoinRequestRepositoryImpl implements JoinRequestRepositoryCustom {
 	}
 
 	@Override
-	public List<JoinRequest> findByRoomAndStatusWithRequester(Room room, JoinRequestStatus status) {
+	public List<JoinRequest> findAllByRoomAndStatusWithRequester(Room room, JoinRequestStatus status) {
 		return queryFactory
 			.selectFrom(joinRequest)
 			.join(joinRequest.requester).fetchJoin()

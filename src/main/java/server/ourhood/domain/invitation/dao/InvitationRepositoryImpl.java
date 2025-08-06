@@ -23,7 +23,7 @@ public class InvitationRepositoryImpl implements InvitationRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<Invitation> findByInviteeAndStatusWithRoomAndHost(User user, InvitationStatus status) {
+	public List<Invitation> findAllByInviteeAndStatusWithRoomAndHost(User user, InvitationStatus status) {
 		return queryFactory
 			.selectFrom(invitation)
 			.join(invitation.room, room).fetchJoin()
@@ -33,7 +33,7 @@ public class InvitationRepositoryImpl implements InvitationRepositoryCustom {
 	}
 
 	@Override
-	public List<Invitation> findByRoomAndStatusWithInvitee(Room room, InvitationStatus status) {
+	public List<Invitation> findAllByRoomAndStatusWithInvitee(Room room, InvitationStatus status) {
 		return queryFactory
 			.selectFrom(invitation)
 			.join(invitation.invitee).fetchJoin()
