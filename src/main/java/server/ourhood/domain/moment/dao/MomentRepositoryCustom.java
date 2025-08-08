@@ -7,7 +7,7 @@ import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.domain.room.domain.Room;
 
 public interface MomentRepositoryCustom {
-	List<Moment> findAllByRoomWithImage(Room room);
+	List<Moment> findAllByRoomWithImageOrderByCreatedAtDesc(Room room);
 
 	Optional<Moment> findByIdWithOwnerAndImage(Long momentId);
 }

@@ -24,6 +24,7 @@ import server.ourhood.domain.moment.dto.response.GetMomentResponse.MomentDetail;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse.MomentMetadata;
 import server.ourhood.domain.moment.dto.response.MomentCreateResponse;
 import server.ourhood.domain.room.application.RoomService;
+import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
@@ -38,6 +39,7 @@ public class MomentService {
 	private final ImageService imageService;
 	private final CloudFrontUtil cloudFrontUtil;
 	private final CommentRepository commentRepository;
+	private final RoomRepository roomRepository;
 	private static final Long ROOT_COMMENT_PARENT_ID = -1L;
 
 	public Moment getByMomentId(Long momentId) {
@@ -48,12 +50,18 @@ public class MomentService {
 	@Transactional
 	public MomentCreateResponse createMoment(User user, MomentCreateRequest request) {
 		Room room = roomService.getByRoomId(request.roomId());
-		room.validateRoomMember(user);
+		validateRoomMember(room.getId(), user);
 		Image image = imageService.findImageByKey(request.momentImageKey());
 		imageService.activateAndMoveImage(image);
 		Moment moment = Moment.createMoment(image, request.momentDescription(), room, user);
 		momentRepository.save(moment);
 		return new MomentCreateResponse(moment.getId());
+	}
+
+	private void validateRoomMember(Long roomId, User user) {
+		if (!roomRepository.existsByIdAndRoomMembersUser(roomId, user)) {
+			throw new BaseException(NOT_ROOM_MEMBER);
+		}
 	}
 
 	@Transactional
@@ -75,7 +83,7 @@ public class MomentService {
 	public GetMomentResponse getMoment(User user, Long momentId) {
 		Moment moment = momentRepository.findByIdWithOwnerAndImage(momentId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_MOMENT));
-		moment.getRoom().validateRoomMember(user);
+		validateRoomMember(moment.getRoom().getId(), user);
 		List<Comment> allComments = commentRepository.findAllCommentsByMomentId(momentId);
 		Map<Long, List<Comment>> commentsByParentId = groupCommentsByParentId(allComments);
 		List<CommentInfoResponse> commentInfoResponse = convertToCommentInfoResponse(commentsByParentId);

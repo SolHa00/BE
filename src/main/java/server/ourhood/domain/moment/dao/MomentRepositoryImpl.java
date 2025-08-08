@@ -20,11 +20,12 @@ public class MomentRepositoryImpl implements MomentRepositoryCustom {
 	private final JPAQueryFactory queryFactory;
 
 	@Override
-	public List<Moment> findAllByRoomWithImage(Room room) {
+	public List<Moment> findAllByRoomWithImageOrderByCreatedAtDesc(Room room) {
 		return queryFactory
 			.selectFrom(moment)
 			.leftJoin(moment.image).fetchJoin()
 			.where(moment.room.eq(room))
+			.orderBy(moment.createdAt.desc())
 			.fetch();
 	}
 

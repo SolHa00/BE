@@ -39,14 +39,11 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
 	}
 
 	@Override
-	public Optional<Room> findByIdWithHostAndThumbnailAndMembersWithUser(Long roomId) {
+	public Optional<Room> findByIdWithHost(Long roomId) {
 		return Optional.ofNullable(
 			queryFactory
 				.selectFrom(room)
 				.join(room.host).fetchJoin()
-				.leftJoin(room.thumbnailImage).fetchJoin()
-				.join(room.roomMembers, roomMembers).fetchJoin()
-				.join(roomMembers.user).fetchJoin()
 				.where(room.id.eq(roomId))
 				.fetchOne());
 	}
@@ -58,6 +55,17 @@ public class RoomRepositoryImpl implements RoomRepositoryCustom {
 				.selectFrom(room)
 				.join(room.host).fetchJoin()
 				.leftJoin(room.thumbnailImage).fetchJoin()
+				.where(room.id.eq(roomId))
+				.fetchOne());
+	}
+
+	@Override
+	public Optional<Room> findByIdWithRoomMembersAndUser(Long roomId) {
+		return Optional.ofNullable(
+			queryFactory
+				.selectFrom(room)
+				.join(room.roomMembers, roomMembers).fetchJoin()
+				.join(roomMembers.user).fetchJoin()
 				.where(room.id.eq(roomId))
 				.fetchOne());
 	}

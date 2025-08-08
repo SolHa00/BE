@@ -8,7 +8,7 @@ import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 
 public interface JoinRequestRepositoryCustom {
-	List<JoinRequest> findByRequesterAndStatusWithRoom(User user, JoinRequestStatus status);
+	List<JoinRequest> findAllByRequesterAndStatusWithRoom(User user, JoinRequestStatus status);
 
-	List<JoinRequest> findByRoomAndStatusWithRequester(Room room, JoinRequestStatus status);
+	List<JoinRequest> findAllByRoomAndStatusWithRequester(Room room, JoinRequestStatus status);
 }

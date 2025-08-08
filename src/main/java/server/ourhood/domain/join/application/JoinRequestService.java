@@ -12,6 +12,7 @@ import server.ourhood.domain.join.domain.JoinRequestStatus;
 import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
 import server.ourhood.domain.join.dto.response.JoinRequestCreateResponse;
 import server.ourhood.domain.room.application.RoomService;
+import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
@@ -22,6 +23,7 @@ public class JoinRequestService {
 
 	private final JoinRequestRepository joinRequestRepository;
 	private final RoomService roomService;
+	private final RoomRepository roomRepository;
 
 	public JoinRequest getByJoinRequestId(Long joinRequestId) {
 		return joinRequestRepository.findById(joinRequestId)
@@ -30,8 +32,8 @@ public class JoinRequestService {
 
 	@Transactional
 	public JoinRequestCreateResponse createJoinRequest(User requester, JoinRequestCreateRequest request) {
+		validateIfAlreadyRoomMember(request.roomId(), requester);
 		Room room = roomService.getByRoomId(request.roomId());
-		validateIfAlreadyRoomMember(room, requester);
 		validateIfAlreadyRequested(room, requester);
 		JoinRequest joinRequest = JoinRequest.createJoinRequest(room, requester);
 		joinRequestRepository.save(joinRequest);
@@ -41,8 +43,8 @@ public class JoinRequestService {
 	/**
 	 * 참여 요청자의 방 멤버 여부 검증
 	 */
-	private void validateIfAlreadyRoomMember(Room room, User requester) {
-		if (room.isMember(requester)) {
+	private void validateIfAlreadyRoomMember(Long roomId, User requester) {
+		if (roomRepository.existsByIdAndRoomMembersUser(roomId, requester)) {
 			throw new BaseException(ALREADY_MEMBER_IN_ROOM);
 		}
 	}
@@ -60,16 +62,22 @@ public class JoinRequestService {
 	public void accept(User reviewer, Long joinRequestId) {
 		JoinRequest joinRequest = getByJoinRequestId(joinRequestId);
 		Room room = joinRequest.getRoom();
-		room.validateRoomMember(reviewer);
+		validateRoomMember(room.getId(), reviewer);
 		joinRequest.accept();
 		room.addRoomMember(joinRequest.getRequester());
+	}
+
+	private void validateRoomMember(Long roomId, User user) {
+		if (!roomRepository.existsByIdAndRoomMembersUser(roomId, user)) {
+			throw new BaseException(NOT_ROOM_MEMBER);
+		}
 	}
 
 	@Transactional
 	public void reject(User reviewer, Long joinRequestId) {
 		JoinRequest joinRequest = getByJoinRequestId(joinRequestId);
 		Room room = joinRequest.getRoom();
-		room.validateRoomMember(reviewer);
+		validateRoomMember(room.getId(), reviewer);
 		joinRequest.reject();
 	}
 

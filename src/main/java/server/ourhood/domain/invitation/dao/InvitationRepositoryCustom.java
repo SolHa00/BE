@@ -8,7 +8,7 @@ import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 
 public interface InvitationRepositoryCustom {
-	List<Invitation> findByInviteeAndStatusWithRoomAndHost(User user, InvitationStatus status);
+	List<Invitation> findAllByInviteeAndStatusWithRoomAndHost(User user, InvitationStatus status);
 
-	List<Invitation> findByRoomAndStatusWithInvitee(Room room, InvitationStatus status);
+	List<Invitation> findAllByRoomAndStatusWithInvitee(Room room, InvitationStatus status);
 }

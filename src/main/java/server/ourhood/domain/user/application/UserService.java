@@ -52,12 +52,12 @@ public class UserService {
 			})
 			.collect(Collectors.toList());
 
-		List<ReceivedInvitations> receivedInvitations = invitationRepository.findByInviteeAndStatusWithRoomAndHost(
+		List<ReceivedInvitations> receivedInvitations = invitationRepository.findAllByInviteeAndStatusWithRoomAndHost(
 				user, InvitationStatus.REQUESTED).stream()
 			.map(ReceivedInvitations::from)
 			.collect(Collectors.toList());
 
-		List<SentJoinRequests> sentJoinRequests = joinRequestRepository.findByRequesterAndStatusWithRoom(user,
+		List<SentJoinRequests> sentJoinRequests = joinRequestRepository.findAllByRequesterAndStatusWithRoom(user,
 				JoinRequestStatus.REQUESTED).stream()
 			.map(SentJoinRequests::from)
 			.collect(Collectors.toList());

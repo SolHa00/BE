@@ -12,6 +12,7 @@ import server.ourhood.domain.invitation.domain.InvitationStatus;
 import server.ourhood.domain.invitation.dto.request.InvitationCreateRequest;
 import server.ourhood.domain.invitation.dto.response.InvitationCreateResponse;
 import server.ourhood.domain.room.application.RoomService;
+import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.dao.UserRepository;
 import server.ourhood.domain.user.domain.User;
@@ -24,6 +25,7 @@ public class InvitationService {
 	private final InvitationRepository invitationRepository;
 	private final UserRepository userRepository;
 	private final RoomService roomService;
+	private final RoomRepository roomRepository;
 
 	public Invitation getByInvitationId(Long invitationId) {
 		return invitationRepository.findById(invitationId)
@@ -32,22 +34,28 @@ public class InvitationService {
 
 	@Transactional
 	public InvitationCreateResponse createInvitation(User inviter, InvitationCreateRequest request) {
-		Room room = roomService.getByRoomId(request.roomId());
-		room.validateRoomMember(inviter);
+		validateRoomMember(request.roomId(), inviter);
 		User invitee = userRepository.findByNickname(request.nickname())
 			.orElseThrow(() -> new BaseException(NOT_FOUND_USER));
-		validateIfAlreadyRoomMember(room, invitee);
+		validateIfAlreadyRoomMember(request.roomId(), invitee);
+		Room room = roomService.getByRoomId(request.roomId());
 		validateIfAlreadyRequested(room, invitee);
 		Invitation invitation = Invitation.createInvitation(room, invitee);
 		invitationRepository.save(invitation);
 		return new InvitationCreateResponse(invitation.getId());
 	}
 
+	private void validateRoomMember(Long roomId, User user) {
+		if (!roomRepository.existsByIdAndRoomMembersUser(roomId, user)) {
+			throw new BaseException(NOT_ROOM_MEMBER);
+		}
+	}
+
 	/**
 	 * 초대 대상의 방 멤버 여부 검증
 	 */
-	private void validateIfAlreadyRoomMember(Room room, User invitee) {
-		if (room.isMember(invitee)) {
+	private void validateIfAlreadyRoomMember(Long roomId, User invitee) {
+		if (roomRepository.existsByIdAndRoomMembersUser(roomId, invitee)) {
 			throw new BaseException(ALREADY_MEMBER_IN_ROOM);
 		}
 	}
@@ -82,7 +90,7 @@ public class InvitationService {
 	public void cancel(User inviter, Long invitationId) {
 		Invitation invitation = getByInvitationId(invitationId);
 		Room room = invitation.getRoom();
-		room.validateRoomMember(inviter);
+		validateRoomMember(room.getId(), inviter);
 		invitation.cancel();
 	}
 }
