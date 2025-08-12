@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.moment.application.MomentService;
 import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
 import server.ourhood.domain.moment.dto.request.MomentUpdateRequest;
+import server.ourhood.domain.moment.dto.response.GetMomentCommentResponse;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse;
 import server.ourhood.domain.moment.dto.response.MomentCreateResponse;
 import server.ourhood.domain.user.domain.User;
@@ -62,6 +63,12 @@ public class MomentController {
 		for (Cookie cookie : signedCookies) {
 			httpResponse.addCookie(cookie);
 		}
+		return BaseResponse.success(response);
+	}
+
+	@GetMapping("/{momentId}/comments")
+	public BaseResponse<GetMomentCommentResponse> getMomentComments(@LoginUser User user, @PathVariable Long momentId) {
+		GetMomentCommentResponse response = momentService.getMomentComments(user, momentId);
 		return BaseResponse.success(response);
 	}
 }

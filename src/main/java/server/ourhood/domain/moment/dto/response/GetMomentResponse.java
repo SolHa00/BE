@@ -1,16 +1,13 @@
 package server.ourhood.domain.moment.dto.response;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-import server.ourhood.domain.comment.dto.response.CommentInfoResponse;
 import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.global.annotation.DateFormat;
 
 public record GetMomentResponse(
 	MomentMetadata momentMetadata,
-	MomentDetail momentDetail,
-	List<CommentInfoResponse> comments
+	MomentDetail momentDetail
 ) {
 	public record MomentMetadata(
 		String momentImageUrl,
