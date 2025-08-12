@@ -12,13 +12,14 @@ import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.comment.dao.CommentRepository;
 import server.ourhood.domain.comment.domain.Comment;
-import server.ourhood.domain.comment.dto.response.CommentInfoResponse;
 import server.ourhood.domain.image.application.ImageService;
 import server.ourhood.domain.image.domain.Image;
 import server.ourhood.domain.moment.dao.MomentRepository;
 import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
 import server.ourhood.domain.moment.dto.request.MomentUpdateRequest;
+import server.ourhood.domain.moment.dto.response.GetMomentCommentResponse;
+import server.ourhood.domain.moment.dto.response.GetMomentCommentResponse.CommentInfo;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse.MomentDetail;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse.MomentMetadata;
@@ -84,15 +85,21 @@ public class MomentService {
 		Moment moment = momentRepository.findByIdWithOwnerAndImage(momentId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_MOMENT));
 		validateRoomMember(moment.getRoom().getId(), user);
-		List<Comment> allComments = commentRepository.findAllCommentsByMomentId(momentId);
-		Map<Long, List<Comment>> commentsByParentId = groupCommentsByParentId(allComments);
-		List<CommentInfoResponse> commentInfoResponse = convertToCommentInfoResponse(commentsByParentId);
-
 		MomentMetadata momentMetadata = MomentMetadata.of(
 			cloudFrontUtil.getImageUrl(moment.getImage().getPermanentFileName()),
 			moment);
 		MomentDetail momentDetail = MomentDetail.of(moment.getDescription());
-		return new GetMomentResponse(momentMetadata, momentDetail, commentInfoResponse);
+		return new GetMomentResponse(momentMetadata, momentDetail);
+	}
+
+	@Transactional(readOnly = true)
+	public GetMomentCommentResponse getMomentComments(User user, Long momentId) {
+		Moment moment = getByMomentId(momentId);
+		validateRoomMember(moment.getRoom().getId(), user);
+		List<Comment> allComments = commentRepository.findAllCommentsByMomentId(momentId);
+		Map<Long, List<Comment>> commentsByParentId = groupCommentsByParentId(allComments);
+		List<CommentInfo> commentInfoList = convertToCommentInfoResponse(commentsByParentId);
+		return new GetMomentCommentResponse(commentInfoList);
 	}
 
 	/**
@@ -113,7 +120,7 @@ public class MomentService {
 	/**
 	 * 그룹핑된 댓글 Map을 계층적인 DTO 리스트로 변환
 	 */
-	private List<CommentInfoResponse> convertToCommentInfoResponse(Map<Long, List<Comment>> commentsByParentId) {
+	private List<CommentInfo> convertToCommentInfoResponse(Map<Long, List<Comment>> commentsByParentId) {
 		List<Comment> rootComments = commentsByParentId.getOrDefault(ROOT_COMMENT_PARENT_ID, List.of());
 		return rootComments.stream()
 			.map(comment -> buildCommentInfoResponse(comment, commentsByParentId))
@@ -123,19 +130,20 @@ public class MomentService {
 	/**
 	 * 댓글 엔티티 하나를 DTO로 변환하는 재귀 헬퍼 메서드
 	 */
-	private CommentInfoResponse buildCommentInfoResponse(Comment comment, Map<Long, List<Comment>> commentsByParentId) {
-		List<CommentInfoResponse> replyCommentsResponses = commentsByParentId.getOrDefault(comment.getId(), List.of())
+	private CommentInfo buildCommentInfoResponse(Comment comment, Map<Long, List<Comment>> commentsByParentId) {
+		List<CommentInfo> replyCommentsResponses = commentsByParentId.getOrDefault(comment.getId(), List.of())
 			.stream()
 			.map(childComment -> buildCommentInfoResponse(childComment, commentsByParentId))
 			.collect(Collectors.toList());
 
-		return CommentInfoResponse.of(
+		return CommentInfo.of(
 			(comment.getParent() != null) ? comment.getParent().getId() : null,
 			comment.getId(),
 			comment.getContent(),
 			comment.getOwner().getId(),
 			comment.getOwner().getNickname(),
 			comment.getCreatedAt(),
-			replyCommentsResponses);
+			replyCommentsResponses
+		);
 	}
 }
