@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: "dev"
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path: /api/health-check
+  endpoint:
+    health:
+      enabled: true
+
+logging:
+  level:
+    root: info
+    org.springframework.security: info
