@@ -1,0 +1,21 @@
+spring:
+  config:
+    activate:
+      on-profile: "prod"
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+management:
+  endpoints:
+    enabled-by-default: false
+    web:
+      base-path: /api/health-check
+  endpoint:
+    health:
+      enabled: true
+
+logging:
+  level:
+    root: error
+    org.springframework.security: error

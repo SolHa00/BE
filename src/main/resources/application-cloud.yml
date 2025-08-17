@@ -1,0 +1,18 @@
+spring:
+  config:
+    activate:
+      on-profile: "cloud"
+cloud:
+  aws:
+    credentials:
+      access-key: ${ACCESS_KEY}
+      secret-key: ${SECRET_KEY}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ${S3_BUCKET}
+    cloudfront:
+      private-key-path: ${CLOUDFRONT_PRIVATE_KEY_PATH}
+      key-pair-id: ${CLOUDFRONT_KEY_PAIR_ID}
+      custom-domain: ${CLOUDFRONT_CUSTOM_DOMAIN}
+      service-domain: ${CLOUDFRONT_SERVICE_DOMAIN}

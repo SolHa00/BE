@@ -1,11 +1,3 @@
-spring:
-  jpa:
-    open-in-view: false
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-
 oauth:
   kakao:
     client-id: ${KAKAO_CLIENT_ID}
@@ -27,18 +19,3 @@ cookie:
     name: "refresh_token"
   cdn:
     expiry: ${COOKIE_CDN_EXPIRY}
-
-cloud:
-  aws:
-    credentials:
-      access-key: ${ACCESS_KEY}
-      secret-key: ${SECRET_KEY}
-    region:
-      static: ap-northeast-2
-    s3:
-      bucket: ${S3_BUCKET}
-    cloudfront:
-      private-key-path: ${CLOUDFRONT_PRIVATE_KEY_PATH}
-      key-pair-id: ${CLOUDFRONT_KEY_PAIR_ID}
-      custom-domain: ${CLOUDFRONT_CUSTOM_DOMAIN}
-      service-domain: ${CLOUDFRONT_SERVICE_DOMAIN}
