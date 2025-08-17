@@ -66,6 +66,9 @@ dependencies {
 
     // 쿼리 파라미터 로그
     implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.12.0'
+
+    // Spring Boot Actuator
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
 }
 
 tasks.named('test') {
