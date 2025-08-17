@@ -1,0 +1,78 @@
+name: OurHood CI/CD Workflow
+
+on:
+  push:
+    branches: [ "develop" ]
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Gradle Caching
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build without test
+        run: ./gradlew clean build -x test
+
+      - name: Create .env file from Secret
+        run: echo "${{ secrets.PRODUCTION_ENV }}" > .env
+        shell: bash
+
+      - name: Create private_key.pem from Secret
+        run: echo "${{ secrets.CLOUDFRONT_PRIVATE_KEY }}" > private_key.pem
+        shell: bash
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ap-northeast-2
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+
+      - name: Login to ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build Docker Image
+        run: docker build -t ourhood-server .
+
+      - name: Tag Docker Image
+        run: docker tag ourhood-server ${{ steps.login-ecr.outputs.registry }}/ourhood-server:latest
+
+      - name: Push Image to AWS ECR Repo
+        run: docker push ${{ steps.login-ecr.outputs.registry }}/ourhood-server:latest
+
+      - name: Create deployment package
+        run: tar -czvf $GITHUB_SHA.tar.gz appspec.yml scripts docker-compose.yml nginx .env private_key.pem
+
+      - name: Upload deployment package to S3
+        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.tar.gz s3://ourhood-s3-bucket/$GITHUB_SHA.tar.gz
+
+      - name: Deploy to EC2 via CodeDeploy
+        run: aws deploy create-deployment
+          --application-name ourhood-server
+          --deployment-config-name CodeDeployDefault.AllAtOnce
+          --deployment-group-name Production
+          --s3-location bucket=ourhood-s3-bucket,bundleType=tgz,key=$GITHUB_SHA.tar.gz
