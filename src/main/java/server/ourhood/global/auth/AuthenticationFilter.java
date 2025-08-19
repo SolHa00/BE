@@ -32,7 +32,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
 	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private static final List<String> ALWAYS_EXCLUDE_PATHS = List.of(
-		"/api/health"
+		"/swagger-ui",
+		"/v3/api-docs",
+		"/api/health-check"
 	);
 
 	static {
