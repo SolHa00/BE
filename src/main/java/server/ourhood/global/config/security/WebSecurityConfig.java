@@ -4,6 +4,7 @@ import static org.springframework.security.config.Customizer.*;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -20,6 +21,18 @@ import jakarta.servlet.http.HttpServletResponse;
 public class WebSecurityConfig {
 
 	@Bean
+	@Order(1)
+	public SecurityFilterChain swaggerFilterChain(HttpSecurity http) throws Exception {
+		defaultFilterChain(http);
+
+		http.securityMatcher("/swagger-ui/**", "/v3/api-docs/**")
+			.httpBasic(withDefaults())
+			.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll());
+
+		return http.build();
+	}
+
+	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		defaultFilterChain(http);
 
@@ -28,7 +41,7 @@ public class WebSecurityConfig {
 					response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.getMessage());
 				}))
 			.authorizeHttpRequests(authorize -> authorize
-				.requestMatchers("/api/health").permitAll()
+				.requestMatchers("/api/health-check").permitAll()
 				.requestMatchers("/api/**").permitAll()
 				.anyRequest().authenticated());
 

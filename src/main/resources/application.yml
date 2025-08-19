@@ -9,5 +9,6 @@ spring:
       - redis
       - security
       - cloud
+      - docs
   jpa:
     open-in-view: false

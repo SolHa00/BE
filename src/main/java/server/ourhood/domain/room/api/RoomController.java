@@ -32,6 +32,7 @@ import server.ourhood.domain.room.dto.response.MemberRoomDetailResponse;
 import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.auth.annotation.LoginUser;
+import server.ourhood.global.auth.annotation.PublicApi;
 import server.ourhood.global.response.BaseResponse;
 import server.ourhood.global.util.CloudFrontUtil;
 
@@ -107,6 +108,7 @@ public class RoomController {
 		return BaseResponse.success(response);
 	}
 
+	@PublicApi
 	@GetMapping
 	public BaseResponse<GetRoomListResponse> getRooms(
 		@RequestParam(required = false) RoomSearchCondition condition,
