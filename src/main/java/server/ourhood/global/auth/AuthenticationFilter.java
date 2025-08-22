@@ -85,18 +85,11 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 		FilterChain filterChain) throws ServletException, IOException {
 
 		try {
-			if (!shouldSkipFilter(request)) {
-				checkTokens(request);
-			}
+			checkTokens(request);
 			filterChain.doFilter(request, response);
 		} catch (BaseException ex) {
 			sendError(response, ex.getStatus());
 		}
-	}
-
-	private boolean shouldSkipFilter(HttpServletRequest request) {
-		String path = request.getRequestURI();
-		return path.startsWith("/api/auth/") || path.equals("/api/health");
 	}
 
 	private void checkTokens(HttpServletRequest request) {
