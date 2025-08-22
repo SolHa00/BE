@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.invitation.api.docs.InvitationControllerDocs;
 import server.ourhood.domain.invitation.application.InvitationService;
 import server.ourhood.domain.invitation.dto.request.InvitationCreateRequest;
 import server.ourhood.domain.invitation.dto.response.InvitationCreateResponse;
@@ -18,7 +19,7 @@ import server.ourhood.global.response.BaseResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/invitations")
-public class InvitationController {
+public class InvitationController implements InvitationControllerDocs {
 
 	private final InvitationService invitationService;
 

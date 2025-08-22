@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.image.api.docs.ImageControllerDocs;
 import server.ourhood.domain.image.application.ImageService;
 import server.ourhood.domain.image.dto.request.MomentImageCreateRequest;
 import server.ourhood.domain.image.dto.request.RoomThumbnailImageCreateRequest;
@@ -18,7 +19,7 @@ import server.ourhood.global.response.BaseResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/images")
-public class ImageController {
+public class ImageController implements ImageControllerDocs {
 
 	private final ImageService imageService;
 

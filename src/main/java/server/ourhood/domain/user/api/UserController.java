@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.user.api.docs.UserControllerDocs;
 import server.ourhood.domain.user.application.UserService;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.domain.user.dto.request.UserInfoUpdateRequest;
@@ -18,7 +19,7 @@ import server.ourhood.global.response.BaseResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
-public class UserController {
+public class UserController implements UserControllerDocs {
 
 	private final UserService userService;
 

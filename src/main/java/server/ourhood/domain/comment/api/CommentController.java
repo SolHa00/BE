@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.comment.api.docs.CommentControllerDocs;
 import server.ourhood.domain.comment.application.CommentService;
 import server.ourhood.domain.comment.dto.request.CommentCreateRequest;
 import server.ourhood.domain.comment.dto.request.CommentUpdateRequest;
@@ -21,7 +22,7 @@ import server.ourhood.global.response.BaseResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/comments")
-public class CommentController {
+public class CommentController implements CommentControllerDocs {
 
 	private final CommentService commentService;
 

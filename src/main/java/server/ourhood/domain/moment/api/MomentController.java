@@ -15,6 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.moment.api.docs.MomentControllerDocs;
 import server.ourhood.domain.moment.application.MomentService;
 import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
 import server.ourhood.domain.moment.dto.request.MomentUpdateRequest;
@@ -29,7 +30,7 @@ import server.ourhood.global.util.CloudFrontUtil;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/moments")
-public class MomentController {
+public class MomentController implements MomentControllerDocs {
 
 	private final MomentService momentService;
 	private final CloudFrontUtil cloudFrontUtil;
