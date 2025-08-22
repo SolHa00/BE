@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.join.api.docs.JoinRequestControllerDocs;
 import server.ourhood.domain.join.application.JoinRequestService;
 import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
 import server.ourhood.domain.join.dto.response.JoinRequestCreateResponse;
@@ -18,7 +19,7 @@ import server.ourhood.global.response.BaseResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/join-requests")
-public class JoinRequestController {
+public class JoinRequestController implements JoinRequestControllerDocs {
 
 	private final JoinRequestService joinRequestService;
 

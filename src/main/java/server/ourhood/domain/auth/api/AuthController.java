@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.auth.api.docs.AuthControllerDocs;
 import server.ourhood.domain.auth.application.AuthService;
 import server.ourhood.domain.auth.domain.OAuthType;
 import server.ourhood.domain.auth.dto.response.AuthResponse;
@@ -25,7 +26,7 @@ import server.ourhood.global.util.CookieUtil;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/auth")
-public class AuthController {
+public class AuthController implements AuthControllerDocs {
 
 	private final AuthService authService;
 	private final CookieUtil cookieUtil;
@@ -37,9 +38,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/login/{oauthType}")
-	public BaseResponse<AuthResponse> login(
-		@PathVariable OAuthType oauthType,
-		@RequestParam String code,
+	public BaseResponse<AuthResponse> login(@PathVariable OAuthType oauthType, @RequestParam String code,
 		HttpServletResponse servletResponse) {
 		AuthServiceResponse serviceResponse = authService.loginAndGenerateToken(oauthType, code);
 		AuthResponse response = serviceResponse.clientResponse();
@@ -56,9 +55,7 @@ public class AuthController {
 
 	@SecuredApi
 	@PostMapping("/logout")
-	public BaseResponse<Void> logout(
-		HttpServletRequest servletRequest,
-		HttpServletResponse servletResponse) {
+	public BaseResponse<Void> logout(HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
 		String refreshToken = cookieUtil.getRefreshToken(servletRequest.getCookies());
 		authService.logout(refreshToken);
 		cookieUtil.deleteCookie(servletResponse);

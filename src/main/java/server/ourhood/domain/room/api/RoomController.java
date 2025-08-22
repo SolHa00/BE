@@ -18,6 +18,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import server.ourhood.domain.room.api.docs.RoomControllerDocs;
 import server.ourhood.domain.room.application.RoomService;
 import server.ourhood.domain.room.dto.request.RoomCreateRequest;
 import server.ourhood.domain.room.dto.request.RoomSearchCondition;
@@ -39,7 +40,7 @@ import server.ourhood.global.util.CloudFrontUtil;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/rooms")
-public class RoomController {
+public class RoomController implements RoomControllerDocs {
 
 	private final RoomService roomService;
 	private final CloudFrontUtil cloudFrontUtil;
