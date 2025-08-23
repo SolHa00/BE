@@ -16,14 +16,14 @@ import server.ourhood.domain.image.application.ImageService;
 import server.ourhood.domain.image.domain.Image;
 import server.ourhood.domain.moment.dao.MomentRepository;
 import server.ourhood.domain.moment.domain.Moment;
-import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
-import server.ourhood.domain.moment.dto.request.MomentUpdateRequest;
+import server.ourhood.domain.moment.dto.request.CreateMomentRequest;
+import server.ourhood.domain.moment.dto.request.UpdateMomentRequest;
+import server.ourhood.domain.moment.dto.response.CreateMomentResponse;
 import server.ourhood.domain.moment.dto.response.GetMomentCommentResponse;
 import server.ourhood.domain.moment.dto.response.GetMomentCommentResponse.CommentInfo;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse.MomentDetail;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse.MomentMetadata;
-import server.ourhood.domain.moment.dto.response.MomentCreateResponse;
 import server.ourhood.domain.room.application.RoomService;
 import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.room.domain.Room;
@@ -49,14 +49,14 @@ public class MomentService {
 	}
 
 	@Transactional
-	public MomentCreateResponse createMoment(User user, MomentCreateRequest request) {
+	public CreateMomentResponse createMoment(User user, CreateMomentRequest request) {
 		Room room = roomService.getByRoomId(request.roomId());
 		validateRoomMember(room.getId(), user);
 		Image image = imageService.findImageByKey(request.momentImageKey());
 		imageService.activateAndMoveImage(image);
 		Moment moment = Moment.createMoment(image, request.momentDescription(), room, user);
 		momentRepository.save(moment);
-		return new MomentCreateResponse(moment.getId());
+		return new CreateMomentResponse(moment.getId());
 	}
 
 	private void validateRoomMember(Long roomId, User user) {
@@ -66,7 +66,7 @@ public class MomentService {
 	}
 
 	@Transactional
-	public void updateMoment(User user, Long momentId, MomentUpdateRequest request) {
+	public void updateMoment(User user, Long momentId, UpdateMomentRequest request) {
 		Moment moment = getByMomentId(momentId);
 		moment.validateOwner(user);
 		moment.updateDescription(request.momentDescription());

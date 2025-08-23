@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.join.dao.JoinRequestRepository;
 import server.ourhood.domain.join.domain.JoinRequest;
 import server.ourhood.domain.join.domain.JoinRequestStatus;
-import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
-import server.ourhood.domain.join.dto.response.JoinRequestCreateResponse;
+import server.ourhood.domain.join.dto.request.CreateJoinRequestRequest;
+import server.ourhood.domain.join.dto.response.CreateJoinRequestResponse;
 import server.ourhood.domain.room.application.RoomService;
 import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.room.domain.Room;
@@ -31,13 +31,13 @@ public class JoinRequestService {
 	}
 
 	@Transactional
-	public JoinRequestCreateResponse createJoinRequest(User requester, JoinRequestCreateRequest request) {
+	public CreateJoinRequestResponse createJoinRequest(User requester, CreateJoinRequestRequest request) {
 		validateIfAlreadyRoomMember(request.roomId(), requester);
 		Room room = roomService.getByRoomId(request.roomId());
 		validateIfAlreadyRequested(room, requester);
 		JoinRequest joinRequest = JoinRequest.createJoinRequest(room, requester);
 		joinRequestRepository.save(joinRequest);
-		return new JoinRequestCreateResponse(joinRequest.getId());
+		return new CreateJoinRequestResponse(joinRequest.getId());
 	}
 
 	/**

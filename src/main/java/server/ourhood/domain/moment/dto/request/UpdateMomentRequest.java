@@ -1,6 +1,6 @@
 package server.ourhood.domain.moment.dto.request;
 
-public record MomentUpdateRequest(
+public record UpdateMomentRequest(
 	String momentDescription
 ) {
 }

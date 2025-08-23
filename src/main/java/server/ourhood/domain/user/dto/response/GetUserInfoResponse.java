@@ -9,7 +9,7 @@ import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.annotation.DateFormat;
 
-public record UserInfoResponse(
+public record GetUserInfoResponse(
 	MyInfo myInfo,
 	List<MyRooms> myRooms,
 	List<ReceivedInvitations> receivedInvitations,

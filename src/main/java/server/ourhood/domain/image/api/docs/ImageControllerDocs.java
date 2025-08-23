@@ -7,9 +7,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import server.ourhood.domain.image.dto.request.MomentImageCreateRequest;
-import server.ourhood.domain.image.dto.request.RoomThumbnailImageCreateRequest;
-import server.ourhood.domain.image.dto.response.PresignedUrlResponse;
+import server.ourhood.domain.image.dto.request.CreateMomentImageRequest;
+import server.ourhood.domain.image.dto.request.CreateRoomThumbnailImageRequest;
+import server.ourhood.domain.image.dto.response.GetPresignedUrlResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.response.BaseResponse;
 
@@ -22,9 +22,9 @@ public interface ImageControllerDocs {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Presigned URL 생성 성공")
 	})
-	BaseResponse<PresignedUrlResponse> createRoomThumbnailPresignedUrl(
+	BaseResponse<GetPresignedUrlResponse> createRoomThumbnailPresignedUrl(
 		User user,
-		@Valid @RequestBody RoomThumbnailImageCreateRequest request
+		@Valid @RequestBody CreateRoomThumbnailImageRequest request
 	);
 
 	@Operation(
@@ -33,8 +33,8 @@ public interface ImageControllerDocs {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "Presigned URL 생성 성공")
 	})
-	BaseResponse<PresignedUrlResponse> createMomentPresignedUrl(
+	BaseResponse<GetPresignedUrlResponse> createMomentPresignedUrl(
 		User user,
-		@Valid @RequestBody MomentImageCreateRequest request
+		@Valid @RequestBody CreateMomentImageRequest request
 	);
 }

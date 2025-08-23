@@ -1,6 +1,6 @@
 package server.ourhood.domain.join.dto.response;
 
-public record JoinRequestCreateResponse(
+public record CreateJoinRequestResponse(
 	Long joinRequestId
 ) {
 }

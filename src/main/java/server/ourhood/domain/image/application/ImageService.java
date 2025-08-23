@@ -12,9 +12,9 @@ import server.ourhood.domain.image.dao.ImageRepository;
 import server.ourhood.domain.image.domain.Image;
 import server.ourhood.domain.image.domain.ImageFileExtension;
 import server.ourhood.domain.image.domain.ImageType;
-import server.ourhood.domain.image.dto.request.MomentImageCreateRequest;
-import server.ourhood.domain.image.dto.request.RoomThumbnailImageCreateRequest;
-import server.ourhood.domain.image.dto.response.PresignedUrlResponse;
+import server.ourhood.domain.image.dto.request.CreateMomentImageRequest;
+import server.ourhood.domain.image.dto.request.CreateRoomThumbnailImageRequest;
+import server.ourhood.domain.image.dto.response.GetPresignedUrlResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.exception.BaseException;
 import server.ourhood.global.util.S3Util;
@@ -29,11 +29,11 @@ public class ImageService {
 	private final ImageRepository imageRepository;
 
 	@Transactional
-	public PresignedUrlResponse createRoomThumbnailPresignedUrl(User user, RoomThumbnailImageCreateRequest request) {
+	public GetPresignedUrlResponse createRoomThumbnailPresignedUrl(User user, CreateRoomThumbnailImageRequest request) {
 		return createPresignedUrl(user, ImageType.ROOM_THUMBNAIL, request.imageFileExtension());
 	}
 
-	private PresignedUrlResponse createPresignedUrl(User user, ImageType imageType,
+	private GetPresignedUrlResponse createPresignedUrl(User user, ImageType imageType,
 		ImageFileExtension imageFileExtension) {
 		validateImageFileExtension(imageFileExtension);
 		String imageKey = uuidGenerator.generateUUID();
@@ -42,7 +42,7 @@ public class ImageService {
 		String fileName = image.getTempFileName();
 		String presignedUrl = s3Util.getS3PresignedUrl(fileName, HttpMethod.PUT,
 			imageFileExtension.getUploadExtension());
-		return PresignedUrlResponse.of(imageKey, presignedUrl);
+		return GetPresignedUrlResponse.of(imageKey, presignedUrl);
 	}
 
 	private void validateImageFileExtension(ImageFileExtension imageFileExtension) {
@@ -57,7 +57,7 @@ public class ImageService {
 	}
 
 	@Transactional
-	public PresignedUrlResponse createMomentPresignedUrl(User user, MomentImageCreateRequest request) {
+	public GetPresignedUrlResponse createMomentPresignedUrl(User user, CreateMomentImageRequest request) {
 		return createPresignedUrl(user, ImageType.MOMENT, request.imageFileExtension());
 	}
 

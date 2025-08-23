@@ -1,6 +1,6 @@
 package server.ourhood.domain.room.dto.response;
 
-public record RoomCreateResponse(
+public record CreateRoomResponse(
 	Long roomId
 ) {
 }

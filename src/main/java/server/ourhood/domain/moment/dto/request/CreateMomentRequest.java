@@ -3,7 +3,7 @@ package server.ourhood.domain.moment.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-public record MomentCreateRequest(
+public record CreateMomentRequest(
 	@NotNull(message = "방 ID는 비워둘 수 없습니다.")
 	Long roomId,
 	String momentDescription,

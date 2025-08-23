@@ -1,6 +1,6 @@
 package server.ourhood.domain.moment.dto.response;
 
-public record MomentCreateResponse(
+public record CreateMomentResponse(
 	Long momentId
 ) {
 }
