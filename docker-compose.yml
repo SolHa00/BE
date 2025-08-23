@@ -22,6 +22,8 @@ services:
     environment:
       - TZ=Asia/Seoul
     network_mode: "host"
+    volumes:
+      - ./redis-data:/data
 
   nginx:
     image: "nginx:alpine"
