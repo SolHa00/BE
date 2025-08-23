@@ -11,8 +11,8 @@ import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.user.api.docs.UserControllerDocs;
 import server.ourhood.domain.user.application.UserService;
 import server.ourhood.domain.user.domain.User;
-import server.ourhood.domain.user.dto.request.UserInfoUpdateRequest;
-import server.ourhood.domain.user.dto.response.UserInfoResponse;
+import server.ourhood.domain.user.dto.request.UpdateUserInfoRequest;
+import server.ourhood.domain.user.dto.response.GetUserInfoResponse;
 import server.ourhood.global.auth.annotation.LoginUser;
 import server.ourhood.global.response.BaseResponse;
 
@@ -24,14 +24,13 @@ public class UserController implements UserControllerDocs {
 	private final UserService userService;
 
 	@GetMapping("/me")
-	public BaseResponse<UserInfoResponse> getUserInfo(@LoginUser User user) {
-		UserInfoResponse response = userService.getUserInfo(user);
-		return BaseResponse.success(response);
+	public BaseResponse<GetUserInfoResponse> getUserInfo(@LoginUser User user) {
+		return BaseResponse.success(userService.getUserInfo(user));
 	}
 
 	@PutMapping("/me")
 	public BaseResponse<Void> updateUserInfo(@LoginUser User user,
-		@Valid @RequestBody UserInfoUpdateRequest request) {
+		@Valid @RequestBody UpdateUserInfoRequest request) {
 		userService.updateUserInfo(user.getId(), request);
 		return BaseResponse.success();
 	}

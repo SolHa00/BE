@@ -10,8 +10,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.invitation.api.docs.InvitationControllerDocs;
 import server.ourhood.domain.invitation.application.InvitationService;
-import server.ourhood.domain.invitation.dto.request.InvitationCreateRequest;
-import server.ourhood.domain.invitation.dto.response.InvitationCreateResponse;
+import server.ourhood.domain.invitation.dto.request.CreateInvitationRequest;
+import server.ourhood.domain.invitation.dto.response.CreateInvitationResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.auth.annotation.LoginUser;
 import server.ourhood.global.response.BaseResponse;
@@ -24,10 +24,9 @@ public class InvitationController implements InvitationControllerDocs {
 	private final InvitationService invitationService;
 
 	@PostMapping
-	public BaseResponse<InvitationCreateResponse> createInvitation(@LoginUser User user,
-		@Valid @RequestBody InvitationCreateRequest request) {
-		InvitationCreateResponse response = invitationService.createInvitation(user, request);
-		return BaseResponse.success(response);
+	public BaseResponse<CreateInvitationResponse> createInvitation(@LoginUser User user,
+		@Valid @RequestBody CreateInvitationRequest request) {
+		return BaseResponse.success(invitationService.createInvitation(user, request));
 	}
 
 	@PostMapping("/{invitationId}/accept")

@@ -12,9 +12,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.comment.api.docs.CommentControllerDocs;
 import server.ourhood.domain.comment.application.CommentService;
-import server.ourhood.domain.comment.dto.request.CommentCreateRequest;
-import server.ourhood.domain.comment.dto.request.CommentUpdateRequest;
-import server.ourhood.domain.comment.dto.response.CommentCreateResponse;
+import server.ourhood.domain.comment.dto.request.CreateCommentRequest;
+import server.ourhood.domain.comment.dto.request.UpdateCommentRequest;
+import server.ourhood.domain.comment.dto.response.CreateCommentResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.auth.annotation.LoginUser;
 import server.ourhood.global.response.BaseResponse;
@@ -27,15 +27,14 @@ public class CommentController implements CommentControllerDocs {
 	private final CommentService commentService;
 
 	@PostMapping
-	public BaseResponse<CommentCreateResponse> createComment(@LoginUser User user,
-		@Valid @RequestBody CommentCreateRequest request) {
-		CommentCreateResponse response = commentService.createComment(user, request);
-		return BaseResponse.success(response);
+	public BaseResponse<CreateCommentResponse> createComment(@LoginUser User user,
+		@Valid @RequestBody CreateCommentRequest request) {
+		return BaseResponse.success(commentService.createComment(user, request));
 	}
 
 	@PutMapping("/{commentId}")
 	public BaseResponse<Void> updateComment(@LoginUser User user, @PathVariable Long commentId,
-		@Valid @RequestBody CommentUpdateRequest request) {
+		@Valid @RequestBody UpdateCommentRequest request) {
 		commentService.updateComment(user, commentId, request);
 		return BaseResponse.success();
 	}

@@ -33,8 +33,7 @@ public class AuthController implements AuthControllerDocs {
 
 	@GetMapping("/{oauthType}")
 	public BaseResponse<OAuthUrlResponse> redirectAuthRequestUrl(@PathVariable OAuthType oauthType) {
-		OAuthUrlResponse response = authService.getAuthCodeRequestUrl(oauthType);
-		return BaseResponse.success(response);
+		return BaseResponse.success(authService.getAuthCodeRequestUrl(oauthType));
 	}
 
 	@PostMapping("/login/{oauthType}")
@@ -49,8 +48,7 @@ public class AuthController implements AuthControllerDocs {
 	@PostMapping("/refresh")
 	public BaseResponse<TokenResponse> refresh(HttpServletRequest servletRequest) {
 		String refreshToken = cookieUtil.getRefreshToken(servletRequest.getCookies());
-		TokenResponse response = authService.refresh(refreshToken);
-		return BaseResponse.success(response);
+		return BaseResponse.success(authService.refresh(refreshToken));
 	}
 
 	@SecuredApi
