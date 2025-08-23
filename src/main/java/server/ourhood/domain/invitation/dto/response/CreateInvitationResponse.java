@@ -1,6 +1,6 @@
 package server.ourhood.domain.invitation.dto.response;
 
-public record InvitationCreateResponse(
+public record CreateInvitationResponse(
 	Long invitationId
 ) {
 }

@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
-import server.ourhood.domain.join.dto.response.JoinRequestCreateResponse;
+import server.ourhood.domain.join.dto.request.CreateJoinRequestRequest;
+import server.ourhood.domain.join.dto.response.CreateJoinRequestResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.response.BaseResponse;
 
@@ -20,9 +20,9 @@ public interface JoinRequestControllerDocs {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "참여 요청 성공")
 	})
-	BaseResponse<JoinRequestCreateResponse> createJoinRequest(
+	BaseResponse<CreateJoinRequestResponse> createJoinRequest(
 		User user,
-		@Valid @RequestBody JoinRequestCreateRequest request
+		@Valid @RequestBody CreateJoinRequestRequest request
 	);
 
 	@Operation(summary = "방 참여 요청 수락", description = "사용자의 참여 요청을 수락합니다.")

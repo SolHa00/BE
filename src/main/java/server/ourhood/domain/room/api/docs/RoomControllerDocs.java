@@ -13,16 +13,16 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import server.ourhood.domain.room.dto.request.RoomCreateRequest;
+import server.ourhood.domain.room.dto.request.CreateRoomRequest;
 import server.ourhood.domain.room.dto.request.RoomSearchCondition;
-import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
+import server.ourhood.domain.room.dto.request.UpdateRoomRequest;
+import server.ourhood.domain.room.dto.response.CreateRoomResponse;
 import server.ourhood.domain.room.dto.response.GetRoomDetailResponse;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse;
 import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse;
 import server.ourhood.domain.room.dto.response.GetRoomListResponse;
 import server.ourhood.domain.room.dto.response.GetRoomMembersResponse;
 import server.ourhood.domain.room.dto.response.GetRoomMomentsResponse;
-import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.response.BaseResponse;
 
@@ -33,9 +33,9 @@ public interface RoomControllerDocs {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "방 생성 성공")
 	})
-	BaseResponse<RoomCreateResponse> createRoom(
+	BaseResponse<CreateRoomResponse> createRoom(
 		User user,
-		@Valid @RequestBody RoomCreateRequest request
+		@Valid @RequestBody CreateRoomRequest request
 	);
 
 	@Operation(summary = "방 정보 수정", description = "방의 정보를 수정합니다. 방장만 가능합니다.")
@@ -45,7 +45,7 @@ public interface RoomControllerDocs {
 	BaseResponse<Void> updateRoom(
 		User user,
 		@Parameter(description = "방 ID", required = true) Long roomId,
-		@Valid @RequestBody RoomUpdateRequest request
+		@Valid @RequestBody UpdateRoomRequest request
 	);
 
 	@Operation(summary = "방 삭제", description = "방을 삭제합니다. 방장만 가능합니다.")

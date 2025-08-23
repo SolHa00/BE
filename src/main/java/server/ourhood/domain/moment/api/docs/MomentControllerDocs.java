@@ -11,11 +11,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
-import server.ourhood.domain.moment.dto.request.MomentUpdateRequest;
+import server.ourhood.domain.moment.dto.request.CreateMomentRequest;
+import server.ourhood.domain.moment.dto.request.UpdateMomentRequest;
+import server.ourhood.domain.moment.dto.response.CreateMomentResponse;
 import server.ourhood.domain.moment.dto.response.GetMomentCommentResponse;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse;
-import server.ourhood.domain.moment.dto.response.MomentCreateResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.response.BaseResponse;
 
@@ -26,9 +26,9 @@ public interface MomentControllerDocs {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "모먼트 생성 성공")
 	})
-	BaseResponse<MomentCreateResponse> createMoment(
+	BaseResponse<CreateMomentResponse> createMoment(
 		User user,
-		@Valid @RequestBody MomentCreateRequest request
+		@Valid @RequestBody CreateMomentRequest request
 	);
 
 	@Operation(summary = "모먼트 수정", description = "모먼트의 내용을 수정합니다. 모먼트 소유자만 가능합니다.")
@@ -38,7 +38,7 @@ public interface MomentControllerDocs {
 	BaseResponse<Void> updateMoment(
 		User user,
 		@Parameter(description = "모먼트 ID", required = true) Long momentId,
-		@Valid @RequestBody MomentUpdateRequest request
+		@Valid @RequestBody UpdateMomentRequest request
 	);
 
 	@Operation(summary = "모먼트 삭제", description = "모먼트를 삭제합니다. 모먼트 소유자만 가능합니다.")

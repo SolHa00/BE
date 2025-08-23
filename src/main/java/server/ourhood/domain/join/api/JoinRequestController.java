@@ -10,8 +10,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.join.api.docs.JoinRequestControllerDocs;
 import server.ourhood.domain.join.application.JoinRequestService;
-import server.ourhood.domain.join.dto.request.JoinRequestCreateRequest;
-import server.ourhood.domain.join.dto.response.JoinRequestCreateResponse;
+import server.ourhood.domain.join.dto.request.CreateJoinRequestRequest;
+import server.ourhood.domain.join.dto.response.CreateJoinRequestResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.auth.annotation.LoginUser;
 import server.ourhood.global.response.BaseResponse;
@@ -24,10 +24,9 @@ public class JoinRequestController implements JoinRequestControllerDocs {
 	private final JoinRequestService joinRequestService;
 
 	@PostMapping
-	public BaseResponse<JoinRequestCreateResponse> createJoinRequest(@LoginUser User user,
-		@Valid @RequestBody JoinRequestCreateRequest request) {
-		JoinRequestCreateResponse response = joinRequestService.createJoinRequest(user, request);
-		return BaseResponse.success(response);
+	public BaseResponse<CreateJoinRequestResponse> createJoinRequest(@LoginUser User user,
+		@Valid @RequestBody CreateJoinRequestRequest request) {
+		return BaseResponse.success(joinRequestService.createJoinRequest(user, request));
 	}
 
 	@PostMapping("/{joinRequestId}/accept")

@@ -9,8 +9,8 @@ import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.invitation.dao.InvitationRepository;
 import server.ourhood.domain.invitation.domain.Invitation;
 import server.ourhood.domain.invitation.domain.InvitationStatus;
-import server.ourhood.domain.invitation.dto.request.InvitationCreateRequest;
-import server.ourhood.domain.invitation.dto.response.InvitationCreateResponse;
+import server.ourhood.domain.invitation.dto.request.CreateInvitationRequest;
+import server.ourhood.domain.invitation.dto.response.CreateInvitationResponse;
 import server.ourhood.domain.room.application.RoomService;
 import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.room.domain.Room;
@@ -33,7 +33,7 @@ public class InvitationService {
 	}
 
 	@Transactional
-	public InvitationCreateResponse createInvitation(User inviter, InvitationCreateRequest request) {
+	public CreateInvitationResponse createInvitation(User inviter, CreateInvitationRequest request) {
 		validateRoomMember(request.roomId(), inviter);
 		User invitee = userRepository.findByNickname(request.nickname())
 			.orElseThrow(() -> new BaseException(NOT_FOUND_USER));
@@ -42,7 +42,7 @@ public class InvitationService {
 		validateIfAlreadyRequested(room, invitee);
 		Invitation invitation = Invitation.createInvitation(room, invitee);
 		invitationRepository.save(invitation);
-		return new InvitationCreateResponse(invitation.getId());
+		return new CreateInvitationResponse(invitation.getId());
 	}
 
 	private void validateRoomMember(Long roomId, User user) {

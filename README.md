@@ -13,7 +13,7 @@ OurHood는 가족, 친구, 팀, 동아리 등 개인적인 조직 단위로 추�
 
 ### ✨IA(Information Architecture)
 
-<img src="./document/image/IA.png" width="500">
+<img src="./document/image/IA.png" width="700">
 
 <br>
 
@@ -52,7 +52,7 @@ OurHood는 가족, 친구, 팀, 동아리 등 개인적인 조직 단위로 추�
 
 ### 🏛 System Architecture
 
-<img src="./document/image/Architecture.png" width="500">
+<img src="./document/image/Architecture.png" width="700">
 
 <br>
 
@@ -77,7 +77,7 @@ OurHood는 가족, 친구, 팀, 동아리 등 개인적인 조직 단위로 추�
 
 ### MySQL Schema
 
-<img src="./document/image/ERD.png" width="500">
+<img src="./document/image/ERD.png" width="700">
 
 <br>
 

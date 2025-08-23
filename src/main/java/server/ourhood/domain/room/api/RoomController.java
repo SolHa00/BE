@@ -20,9 +20,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.room.api.docs.RoomControllerDocs;
 import server.ourhood.domain.room.application.RoomService;
-import server.ourhood.domain.room.dto.request.RoomCreateRequest;
+import server.ourhood.domain.room.dto.request.CreateRoomRequest;
 import server.ourhood.domain.room.dto.request.RoomSearchCondition;
-import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
+import server.ourhood.domain.room.dto.request.UpdateRoomRequest;
+import server.ourhood.domain.room.dto.response.CreateRoomResponse;
 import server.ourhood.domain.room.dto.response.GetRoomDetailResponse;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse;
 import server.ourhood.domain.room.dto.response.GetRoomJoinRequestResponse;
@@ -30,7 +31,6 @@ import server.ourhood.domain.room.dto.response.GetRoomListResponse;
 import server.ourhood.domain.room.dto.response.GetRoomMembersResponse;
 import server.ourhood.domain.room.dto.response.GetRoomMomentsResponse;
 import server.ourhood.domain.room.dto.response.MemberRoomDetailResponse;
-import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.auth.annotation.LoginUser;
 import server.ourhood.global.auth.annotation.PublicApi;
@@ -46,15 +46,14 @@ public class RoomController implements RoomControllerDocs {
 	private final CloudFrontUtil cloudFrontUtil;
 
 	@PostMapping
-	public BaseResponse<RoomCreateResponse> createRoom(@LoginUser User user,
-		@Valid @RequestBody RoomCreateRequest request) {
-		RoomCreateResponse response = roomService.createRoom(user, request);
-		return BaseResponse.success(response);
+	public BaseResponse<CreateRoomResponse> createRoom(@LoginUser User user,
+		@Valid @RequestBody CreateRoomRequest request) {
+		return BaseResponse.success(roomService.createRoom(user, request));
 	}
 
 	@PutMapping("/{roomId}")
 	public BaseResponse<Void> updateRoom(@LoginUser User user, @PathVariable Long roomId,
-		@Valid @RequestBody RoomUpdateRequest request) {
+		@Valid @RequestBody UpdateRoomRequest request) {
 		roomService.updateRoom(user, roomId, request);
 		return BaseResponse.success();
 	}
@@ -86,27 +85,23 @@ public class RoomController implements RoomControllerDocs {
 
 	@GetMapping("/{roomId}/members")
 	public BaseResponse<GetRoomMembersResponse> getRoomMembersInfo(@LoginUser User user, @PathVariable Long roomId) {
-		GetRoomMembersResponse response = roomService.getRoomMembersInfo(user, roomId);
-		return BaseResponse.success(response);
+		return BaseResponse.success(roomService.getRoomMembersInfo(user, roomId));
 	}
 
 	@GetMapping("/{roomId}/moments")
 	public BaseResponse<GetRoomMomentsResponse> getRoomMomentsInfo(@LoginUser User user, @PathVariable Long roomId) {
-		GetRoomMomentsResponse response = roomService.getRoomMomentsInfo(user, roomId);
-		return BaseResponse.success(response);
+		return BaseResponse.success(roomService.getRoomMomentsInfo(user, roomId));
 	}
 
 	@GetMapping("/{roomId}/join-requests")
 	public BaseResponse<GetRoomJoinRequestResponse> getRoomJoinRequests(@LoginUser User user,
 		@PathVariable Long roomId) {
-		GetRoomJoinRequestResponse response = roomService.getRoomJoinRequests(user, roomId);
-		return BaseResponse.success(response);
+		return BaseResponse.success(roomService.getRoomJoinRequests(user, roomId));
 	}
 
 	@GetMapping("/{roomId}/invitations")
 	public BaseResponse<GetRoomInvitationResponse> getRoomInvitations(@LoginUser User user, @PathVariable Long roomId) {
-		GetRoomInvitationResponse response = roomService.getRoomInvitations(user, roomId);
-		return BaseResponse.success(response);
+		return BaseResponse.success(roomService.getRoomInvitations(user, roomId));
 	}
 
 	@PublicApi
@@ -115,7 +110,6 @@ public class RoomController implements RoomControllerDocs {
 		@RequestParam(required = false) RoomSearchCondition condition,
 		@RequestParam(required = false) String q,
 		@SortDefault(sort = "createdAt", direction = Sort.Direction.DESC) Sort sort) {
-		GetRoomListResponse response = roomService.getRooms(condition, q, sort);
-		return BaseResponse.success(response);
+		return BaseResponse.success(roomService.getRooms(condition, q, sort));
 	}
 }

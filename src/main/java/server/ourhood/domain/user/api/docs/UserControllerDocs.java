@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import server.ourhood.domain.user.domain.User;
-import server.ourhood.domain.user.dto.request.UserInfoUpdateRequest;
-import server.ourhood.domain.user.dto.response.UserInfoResponse;
+import server.ourhood.domain.user.dto.request.UpdateUserInfoRequest;
+import server.ourhood.domain.user.dto.response.GetUserInfoResponse;
 import server.ourhood.global.response.BaseResponse;
 
 @Tag(name = "[2. 회원]", description = "회원 관련 API")
@@ -19,7 +19,7 @@ public interface UserControllerDocs {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "내 정보 조회 성공")
 	})
-	BaseResponse<UserInfoResponse> getUserInfo(
+	BaseResponse<GetUserInfoResponse> getUserInfo(
 		User user
 	);
 
@@ -29,6 +29,6 @@ public interface UserControllerDocs {
 	})
 	BaseResponse<Void> updateUserInfo(
 		User user,
-		@Valid @RequestBody UserInfoUpdateRequest request
+		@Valid @RequestBody UpdateUserInfoRequest request
 	);
 }

@@ -17,11 +17,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import server.ourhood.domain.moment.api.docs.MomentControllerDocs;
 import server.ourhood.domain.moment.application.MomentService;
-import server.ourhood.domain.moment.dto.request.MomentCreateRequest;
-import server.ourhood.domain.moment.dto.request.MomentUpdateRequest;
+import server.ourhood.domain.moment.dto.request.CreateMomentRequest;
+import server.ourhood.domain.moment.dto.request.UpdateMomentRequest;
+import server.ourhood.domain.moment.dto.response.CreateMomentResponse;
 import server.ourhood.domain.moment.dto.response.GetMomentCommentResponse;
 import server.ourhood.domain.moment.dto.response.GetMomentResponse;
-import server.ourhood.domain.moment.dto.response.MomentCreateResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.auth.annotation.LoginUser;
 import server.ourhood.global.response.BaseResponse;
@@ -36,15 +36,14 @@ public class MomentController implements MomentControllerDocs {
 	private final CloudFrontUtil cloudFrontUtil;
 
 	@PostMapping
-	public BaseResponse<MomentCreateResponse> createMoment(@LoginUser User user,
-		@Valid @RequestBody MomentCreateRequest request) {
-		MomentCreateResponse response = momentService.createMoment(user, request);
-		return BaseResponse.success(response);
+	public BaseResponse<CreateMomentResponse> createMoment(@LoginUser User user,
+		@Valid @RequestBody CreateMomentRequest request) {
+		return BaseResponse.success(momentService.createMoment(user, request));
 	}
 
 	@PutMapping("/{momentId}")
 	public BaseResponse<Void> updateMoment(@LoginUser User user, @PathVariable Long momentId,
-		@Valid @RequestBody MomentUpdateRequest request) {
+		@Valid @RequestBody UpdateMomentRequest request) {
 		momentService.updateMoment(user, momentId, request);
 		return BaseResponse.success();
 	}
@@ -69,7 +68,6 @@ public class MomentController implements MomentControllerDocs {
 
 	@GetMapping("/{momentId}/comments")
 	public BaseResponse<GetMomentCommentResponse> getMomentComments(@LoginUser User user, @PathVariable Long momentId) {
-		GetMomentCommentResponse response = momentService.getMomentComments(user, momentId);
-		return BaseResponse.success(response);
+		return BaseResponse.success(momentService.getMomentComments(user, momentId));
 	}
 }

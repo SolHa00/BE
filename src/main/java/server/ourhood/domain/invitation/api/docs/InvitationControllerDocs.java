@@ -8,8 +8,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import server.ourhood.domain.invitation.dto.request.InvitationCreateRequest;
-import server.ourhood.domain.invitation.dto.response.InvitationCreateResponse;
+import server.ourhood.domain.invitation.dto.request.CreateInvitationRequest;
+import server.ourhood.domain.invitation.dto.response.CreateInvitationResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.response.BaseResponse;
 
@@ -20,9 +20,9 @@ public interface InvitationControllerDocs {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "초대 성공")
 	})
-	BaseResponse<InvitationCreateResponse> createInvitation(
+	BaseResponse<CreateInvitationResponse> createInvitation(
 		User user,
-		@Valid @RequestBody InvitationCreateRequest request
+		@Valid @RequestBody CreateInvitationRequest request
 	);
 
 	@Operation(summary = "초대 수락", description = "사용자가 자신에게 온 초대를 수락합니다.")

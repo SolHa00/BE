@@ -23,9 +23,10 @@ import server.ourhood.domain.moment.domain.Moment;
 import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.room.domain.Room;
 import server.ourhood.domain.room.domain.RoomMembers;
-import server.ourhood.domain.room.dto.request.RoomCreateRequest;
+import server.ourhood.domain.room.dto.request.CreateRoomRequest;
 import server.ourhood.domain.room.dto.request.RoomSearchCondition;
-import server.ourhood.domain.room.dto.request.RoomUpdateRequest;
+import server.ourhood.domain.room.dto.request.UpdateRoomRequest;
+import server.ourhood.domain.room.dto.response.CreateRoomResponse;
 import server.ourhood.domain.room.dto.response.GetRoomDetailResponse;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse;
 import server.ourhood.domain.room.dto.response.GetRoomInvitationResponse.RoomInvitation;
@@ -38,7 +39,6 @@ import server.ourhood.domain.room.dto.response.GetRoomMembersResponse.MemberInfo
 import server.ourhood.domain.room.dto.response.GetRoomMomentsResponse;
 import server.ourhood.domain.room.dto.response.MemberRoomDetailResponse;
 import server.ourhood.domain.room.dto.response.NonMemberRoomDetailResponse;
-import server.ourhood.domain.room.dto.response.RoomCreateResponse;
 import server.ourhood.domain.room.dto.response.RoomDetailResponse;
 import server.ourhood.domain.room.dto.response.RoomMetadataResponse;
 import server.ourhood.domain.room.dto.response.UserContextResponse;
@@ -63,7 +63,7 @@ public class RoomService {
 	}
 
 	@Transactional
-	public RoomCreateResponse createRoom(User user, RoomCreateRequest request) {
+	public CreateRoomResponse createRoom(User user, CreateRoomRequest request) {
 		Image thumbnailImage = imageService.findImageByKey(request.thumbnailImageKey());
 		if (thumbnailImage != null) {
 			imageService.activateAndMoveImage(thumbnailImage);
@@ -71,11 +71,11 @@ public class RoomService {
 		Room room = Room.createRoom(request.roomName(), request.roomDescription(), thumbnailImage, user);
 		room.addRoomMember(user);
 		roomRepository.save(room);
-		return new RoomCreateResponse(room.getId());
+		return new CreateRoomResponse(room.getId());
 	}
 
 	@Transactional
-	public void updateRoom(User user, Long roomId, RoomUpdateRequest request) {
+	public void updateRoom(User user, Long roomId, UpdateRoomRequest request) {
 		Room room = roomRepository.findByIdWithHost(roomId)
 			.orElseThrow(() -> new BaseException(NOT_FOUND_ROOM));
 		validateRoomHost(user, room);

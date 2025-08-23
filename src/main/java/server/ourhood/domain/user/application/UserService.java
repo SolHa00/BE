@@ -1,6 +1,6 @@
 package server.ourhood.domain.user.application;
 
-import static server.ourhood.domain.user.dto.response.UserInfoResponse.*;
+import static server.ourhood.domain.user.dto.response.GetUserInfoResponse.*;
 import static server.ourhood.global.exception.BaseResponseStatus.*;
 
 import java.util.List;
@@ -18,8 +18,8 @@ import server.ourhood.domain.join.domain.JoinRequestStatus;
 import server.ourhood.domain.room.dao.RoomRepository;
 import server.ourhood.domain.user.dao.UserRepository;
 import server.ourhood.domain.user.domain.User;
-import server.ourhood.domain.user.dto.request.UserInfoUpdateRequest;
-import server.ourhood.domain.user.dto.response.UserInfoResponse;
+import server.ourhood.domain.user.dto.request.UpdateUserInfoRequest;
+import server.ourhood.domain.user.dto.response.GetUserInfoResponse;
 import server.ourhood.global.exception.BaseException;
 import server.ourhood.global.util.CloudFrontUtil;
 
@@ -39,7 +39,7 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public UserInfoResponse getUserInfo(User user) {
+	public GetUserInfoResponse getUserInfo(User user) {
 		MyInfo myInfo = MyInfo.from(user);
 
 		List<MyRooms> myRooms = roomRepository.findAllByMemberWithHostAndThumbnailAndMembers(user).stream()
@@ -62,11 +62,11 @@ public class UserService {
 			.map(SentJoinRequests::from)
 			.collect(Collectors.toList());
 
-		return new UserInfoResponse(myInfo, myRooms, receivedInvitations, sentJoinRequests);
+		return new GetUserInfoResponse(myInfo, myRooms, receivedInvitations, sentJoinRequests);
 	}
 
 	@Transactional
-	public void updateUserInfo(Long userId, UserInfoUpdateRequest request) {
+	public void updateUserInfo(Long userId, UpdateUserInfoRequest request) {
 		User user = getByUserId(userId);
 		user.updateNickname(request.nickname());
 	}

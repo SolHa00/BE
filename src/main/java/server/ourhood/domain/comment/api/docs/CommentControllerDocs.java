@@ -8,9 +8,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import server.ourhood.domain.comment.dto.request.CommentCreateRequest;
-import server.ourhood.domain.comment.dto.request.CommentUpdateRequest;
-import server.ourhood.domain.comment.dto.response.CommentCreateResponse;
+import server.ourhood.domain.comment.dto.request.CreateCommentRequest;
+import server.ourhood.domain.comment.dto.request.UpdateCommentRequest;
+import server.ourhood.domain.comment.dto.response.CreateCommentResponse;
 import server.ourhood.domain.user.domain.User;
 import server.ourhood.global.response.BaseResponse;
 
@@ -21,9 +21,9 @@ public interface CommentControllerDocs {
 	@ApiResponses({
 		@ApiResponse(responseCode = "200", description = "댓글 작성 성공")
 	})
-	BaseResponse<CommentCreateResponse> createComment(
+	BaseResponse<CreateCommentResponse> createComment(
 		User user,
-		@Valid @RequestBody CommentCreateRequest request
+		@Valid @RequestBody CreateCommentRequest request
 	);
 
 	@Operation(summary = "댓글 수정", description = "자신이 작성한 댓글의 내용을 수정합니다.")
@@ -33,7 +33,7 @@ public interface CommentControllerDocs {
 	BaseResponse<Void> updateComment(
 		User user,
 		@Parameter(description = "댓글 ID", required = true) Long commentId,
-		@Valid @RequestBody CommentUpdateRequest request
+		@Valid @RequestBody UpdateCommentRequest request
 	);
 
 	@Operation(summary = "댓글 삭제", description = "자신이 작성한 댓글을 삭제합니다.")
