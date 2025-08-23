@@ -9,35 +9,46 @@ import server.ourhood.global.exception.BaseResponseStatus;
 
 @Getter
 @AllArgsConstructor
-@JsonPropertyOrder({"code", "message", "result"})
+@JsonPropertyOrder({"isSuccess", "code", "message", "result"})
 public class BaseResponse<T> {
 
+	private final Boolean isSuccess;
 	private final int code;
 	private final String message;
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private final T result;
 
-	private BaseResponse(BaseResponseStatus status) {
-		this.code = status.getCode();
-		this.message = status.getMessage();
-		this.result = null;
-	}
-
 	private BaseResponse(BaseResponseStatus status, T result) {
+		this.isSuccess = true;
 		this.code = status.getCode();
 		this.message = status.getMessage();
 		this.result = result;
 	}
 
 	public static <T> BaseResponse<T> success() {
-		return new BaseResponse<>(BaseResponseStatus.SUCCESS);
+		return new BaseResponse<>(
+			true,
+			BaseResponseStatus.SUCCESS.getCode(),
+			BaseResponseStatus.SUCCESS.getMessage(),
+			null
+		);
 	}
 
 	public static <T> BaseResponse<T> success(T result) {
-		return new BaseResponse<>(BaseResponseStatus.SUCCESS, result);
+		return new BaseResponse<>(
+			true,
+			BaseResponseStatus.SUCCESS.getCode(),
+			BaseResponseStatus.SUCCESS.getMessage(),
+			result
+		);
 	}
 
 	public static <T> BaseResponse<T> fail(BaseResponseStatus status) {
-		return new BaseResponse<>(status);
+		return new BaseResponse<>(
+			false,
+			status.getCode(),
+			status.getMessage(),
+			null
+		);
 	}
 }
