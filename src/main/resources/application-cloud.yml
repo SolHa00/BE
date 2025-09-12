@@ -5,10 +5,10 @@ spring:
 cloud:
   aws:
     credentials:
-      access-key: ${ACCESS_KEY}
-      secret-key: ${SECRET_KEY}
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
     region:
-      static: ap-northeast-2
+      static: ${AWS_REGION}
     s3:
       bucket: ${S3_BUCKET}
     cloudfront:
