@@ -38,3 +38,6 @@ out/
 
 ### private key ###
 src/main/resources/private_key.pem
+
+### config yml ###
+.env
