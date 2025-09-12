@@ -36,14 +36,6 @@ jobs:
       - name: Build without test
         run: ./gradlew clean build -x test
 
-      - name: Create .env file from Secret
-        run: echo "${{ secrets.PRODUCTION_ENV }}" > .env
-        shell: bash
-
-      - name: Create private_key.pem from Secret
-        run: echo "${{ secrets.CLOUDFRONT_PRIVATE_KEY }}" > private_key.pem
-        shell: bash
-
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -51,28 +43,65 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
 
+      # ECR 로그인
       - name: Login to ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build Docker Image
-        run: docker build -t ourhood-server .
+      # Docker 이미지 빌드 및 AWS ECR로 푸시
+      - name: Build Docker Image And Push to AWS ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ourhood-server
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-      - name: Tag Docker Image
-        run: docker tag ourhood-server ${{ steps.login-ecr.outputs.registry }}/ourhood-server:latest
+      # 서버로 docker-compose 파일 전송
+      - name: Copy docker-compose file to EC2
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_user: ${{ secrets.EC2_USERNAME }}
+          remote_key: ${{ secrets.EC2_KEY }}
+          path: docker-compose.yml
+          remote_path: /home/ubuntu
 
-      - name: Push Image to AWS ECR Repo
-        run: docker push ${{ steps.login-ecr.outputs.registry }}/ourhood-server:latest
+      - name: Copy nginx config directory to EC2
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_user: ${{ secrets.EC2_USERNAME }}
+          remote_key: ${{ secrets.EC2_KEY }}
+          path: nginx/
+          remote_path: /home/ubuntu/nginx
 
-      - name: Create deployment package
-        run: tar -czvf $GITHUB_SHA.tar.gz appspec.yml scripts docker-compose.yml nginx .env private_key.pem
+      - name: Create private_key.pem from Secret
+        run: echo "${{ secrets.CLOUDFRONT_PRIVATE_KEY }}" > private_key.pem
+        shell: bash
 
-      - name: Upload deployment package to S3
-        run: aws s3 cp --region ap-northeast-2 ./$GITHUB_SHA.tar.gz s3://ourhood-s3-bucket/$GITHUB_SHA.tar.gz
+      - name: Copy private_key.pem to EC2
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -avzr
+          remote_host: ${{ secrets.EC2_HOST }}
+          remote_user: ${{ secrets.EC2_USERNAME }}
+          remote_key: ${{ secrets.EC2_KEY }}
+          path: private_key.pem
+          remote_path: /home/ubuntu
 
-      - name: Deploy to EC2 via CodeDeploy
-        run: aws deploy create-deployment
-          --application-name ourhood-server
-          --deployment-config-name CodeDeployDefault.AllAtOnce
-          --deployment-group-name Production
-          --s3-location bucket=ourhood-s3-bucket,bundleType=tgz,key=$GITHUB_SHA.tar.gz
+      # EC2로 배포
+      - name: AWS EC2 Server Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            echo "${{ secrets.ENV_PROD }}" > .env
+            export IMAGE_FULL_URL=${{ steps.login-ecr.outputs.registry }}/ourhood-server:${{ github.sha }}
+            docker compose up -d
+            docker image prune -a -f

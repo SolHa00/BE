@@ -9,7 +9,7 @@ oauth:
       user-info-url: https://kapi.kakao.com/v2/user/me
 
 auth:
-  access-token-secret: ${JWT_ACCESS_TOKEN_SECRET}
+  access-token-secret: ${JWT_SECRET}
   access-token-expiration-time: ${JWT_ACCESS_TOKEN_EXPIRATION_TIME}
   refresh-token-expiration-time: ${REFRESH_TOKEN_EXPIRATION_TIME}
 
